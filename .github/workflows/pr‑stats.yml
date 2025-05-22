@@ -1,13 +1,13 @@
 name: PR stats
 
 on:
-  schedule: # every 3 h
+  schedule:
     - cron: "0 */3 * * *"
     workflow_dispatch:
 
 
 permissions:
-  contents: write # allow committing the chart
+  contents: write
 
 jobs:
   track:
