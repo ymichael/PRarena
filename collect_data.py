@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PR‑tracker: counts Copilot / Codex PRs and saves data to CSV.
+# Tracks merged PRs (not just approved ones)
 # deps: requests
 
 import csv
@@ -13,12 +14,12 @@ HEADERS = {
     "User-Agent": "PR-Watcher"
 }
 
-# Search queries
+# Search queries - tracking merged PRs
 Q = {
-    "is:pr+head:copilot/":                 "copilot_total",
-    "is:pr+head:copilot/+review:approved": "copilot_approved",
-    "is:pr+head:codex/":                   "codex_total",
-    "is:pr+head:codex/+review:approved":   "codex_approved",
+    "is:pr+head:copilot/":              "copilot_total",
+    "is:pr+head:copilot/+is:merged":    "copilot_merged",
+    "is:pr+head:codex/":                "codex_total",
+    "is:pr+head:codex/+is:merged":      "codex_merged",
 }
 
 def collect_data():
@@ -32,16 +33,16 @@ def collect_data():
 
     # Save data to CSV
     timestamp = dt.datetime.now(dt.UTC).strftime("%Y‑%m‑%d %H:%M:%S")
-    row = [timestamp, cnt["copilot_total"], cnt["copilot_approved"],
-           cnt["codex_total"], cnt["codex_approved"]]
+    row = [timestamp, cnt["copilot_total"], cnt["copilot_merged"],
+           cnt["codex_total"], cnt["codex_merged"]]
 
     csv_file = Path("data.csv")
     is_new_file = not csv_file.exists()
     with csv_file.open("a", newline="") as f:
         writer = csv.writer(f)
         if is_new_file:
-            writer.writerow(["timestamp", "copilot_total", "copilot_approved",
-                            "codex_total", "codex_approved"])
+            writer.writerow(["timestamp", "copilot_total", "copilot_merged",
+                            "codex_total", "codex_merged"])
         writer.writerow(row)
 
     return csv_file
