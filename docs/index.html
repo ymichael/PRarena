@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR Analytics: Volume vs Success Rate</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta http-equiv="refresh" content="3600"> <!-- Auto-refresh every hour -->
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PR Analytics: Volume vs Success Rate</h1>
+            <p class="subtitle">Tracking Copilot vs Codex PR performance</p>
+        </header>
+
+        <section class="data-sources">
+            <h2>Data sources</h2>
+            <p>Explore the GitHub search queries used:</p>
+            <ul>
+                <li><strong>All Copilot PRs</strong>: <a href="https://github.com/search?q=is:pr+head:copilot/&type=pullrequests">is:pr head:copilot/</a></li>
+                <li><strong>Merged Copilot PRs</strong>: <a href="https://github.com/search?q=is:pr+head:copilot/+is:merged&type=pullrequests">is:pr head:copilot/ is:merged</a></li>
+                <li><strong>All Codex PRs</strong>: <a href="https://github.com/search?q=is:pr+head:codex/&type=pullrequests">is:pr head:codex/</a></li>
+                <li><strong>Merged Codex PRs</strong>: <a href="https://github.com/search?q=is:pr+head:codex/+is:merged&type=pullrequests">is:pr head:codex/ is:merged</a></li>
+            </ul>
+        </section>
+
+        <section class="chart">
+            <h2>PR Analytics Chart</h2>
+            <img src="chart.png" alt="PR Analytics Chart" class="chart-image">
+        </section>
+
+        <section class="statistics">
+            <h2>Current Statistics</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Total PRs</th>
+                        <th>Merged PRs</th>
+                        <th>Merge Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Copilot</td>
+                        <td>8,852</td>
+                        <td>1,662</td>
+                        <td>18.78%</td>
+                    </tr>
+                    <tr>
+                        <td>Codex</td>
+                        <td>55,314</td>
+                        <td>45,185</td>
+                        <td>81.69%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <footer>
+            <p>Last updated: <span id="last-updated">May 26, 2025 22:24 UTC</span></p>
+            <p><a href="https://github.com/aavetis/ai-pr-watcher">View on GitHub</a></p>
+        </footer>
+    </div>
+</body>
+</html>
