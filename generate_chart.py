@@ -34,6 +34,14 @@ def generate_chart(csv_file=None):
     if len(df) == 0:
         print("Error: No data found in CSV file.")
         return False
+        
+    # Limit to 8 data points spread across the entire dataset to avoid chart getting too busy
+    total_points = len(df)
+    if total_points > 8:
+        # Create evenly spaced indices across the entire dataset
+        indices = np.linspace(0, total_points - 1, num=8, dtype=int)
+        df = df.iloc[indices]
+        print(f"Limited chart to 8 data points evenly distributed across {total_points} total points.")
 
     # Calculate percentages with safety checks
     df["copilot_percentage"] = df.apply(
