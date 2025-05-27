@@ -222,9 +222,19 @@ def generate_chart(csv_file=None):
     dpi = 150 if num_points <= 5 else 300
     fig.savefig(chart_file, dpi=dpi, bbox_inches="tight", facecolor="white")
     print(f"Chart generated: {chart_file}")
+    
+    # Also save chart to docs directory for GitHub Pages
+    docs_dir = Path("docs")
+    if docs_dir.exists():
+        docs_chart_file = docs_dir / "chart.png"
+        fig.savefig(docs_chart_file, dpi=dpi, bbox_inches="tight", facecolor="white")
+        print(f"Chart copied to GitHub Pages: {docs_chart_file}")
 
     # Update the README with latest statistics
     update_readme(df)
+    
+    # Update the GitHub Pages with latest statistics
+    update_github_pages(df)
 
     return True
 
@@ -272,6 +282,60 @@ def update_readme(df):
     # Write the updated content back
     readme_path.write_text(new_content)
     print(f"README.md updated with latest statistics.")
+    return True
+
+
+def update_github_pages(df):
+    """Update the GitHub Pages website with the latest statistics"""
+    index_path = Path("docs/index.html")
+    
+    # Skip if index.html doesn't exist
+    if not index_path.exists():
+        print(f"Warning: {index_path} not found, skipping GitHub Pages update.")
+        return False
+    
+    # Get the latest data
+    latest = df.iloc[-1]
+    
+    # Calculate merge rates
+    copilot_rate = latest.copilot_merged / latest.copilot_total * 100
+    codex_rate = latest.codex_merged / latest.codex_total * 100
+    
+    # Format numbers with commas
+    copilot_total = f"{latest.copilot_total:,}"
+    copilot_merged = f"{latest.copilot_merged:,}"
+    codex_total = f"{latest.codex_total:,}"
+    codex_merged = f"{latest.codex_merged:,}"
+    
+    # Current timestamp for last updated
+    timestamp = dt.datetime.now().strftime("%B %d, %Y %H:%M UTC")
+    
+    # Read the current index.html content
+    index_content = index_path.read_text()
+    
+    # Update the table data
+    index_content = re.sub(
+        r'<td>Copilot</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
+        f'<td>Copilot</td>\n                        <td>{copilot_total}</td>\n                        <td>{copilot_merged}</td>\n                        <td>{copilot_rate:.2f}%</td>',
+        index_content
+    )
+    
+    index_content = re.sub(
+        r'<td>Codex</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
+        f'<td>Codex</td>\n                        <td>{codex_total}</td>\n                        <td>{codex_merged}</td>\n                        <td>{codex_rate:.2f}%</td>',
+        index_content
+    )
+    
+    # Update the last updated timestamp
+    index_content = re.sub(
+        r'<span id="last-updated">[^<]*</span>',
+        f'<span id="last-updated">{timestamp}</span>',
+        index_content
+    )
+    
+    # Write the updated content back
+    index_path.write_text(index_content)
+    print(f"GitHub Pages updated with latest statistics.")
     return True
 
 
