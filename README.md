@@ -19,5 +19,5 @@ Explore the GitHub search queries used:
 
 | Project | Total PRs | Merged PRs | Merge Rate |
 | ------- | --------- | ---------- | ---------- |
-| Copilot | 9,429 | 2,055 | 21.79% |
-| Codex   | 60,227 | 49,553 | 82.28% |
+| Copilot | 9,459 | 2,080 | 21.99% |
+| Codex   | 60,579 | 49,885 | 82.35% |
