@@ -60,6 +60,14 @@ def generate_chart(csv_file=None):
         ),
         axis=1,
     )
+    df["devin_percentage"] = df.apply(
+        lambda row: (
+            (row["devin_merged"] / row["devin_total"] * 100)
+            if row["devin_total"] > 0
+            else 0
+        ),
+        axis=1,
+    )
 
     # Adjust chart size based on data points
     num_points = len(df)
@@ -76,12 +84,12 @@ def generate_chart(csv_file=None):
 
     # Prepare data
     x = np.arange(len(df))
-    # Adjust bar width based on number of data points
-    width = min(0.35, 0.8 / max(1, num_points * 0.5))
+    # Adjust bar width based on number of data points (3 groups now)
+    width = min(0.25, 0.8 / max(1, num_points * 0.6))
 
     # Bar charts for totals and merged
     bars_copilot_total = ax1.bar(
-        x - width / 2,
+        x - width,
         df["copilot_total"],
         width,
         label="Copilot Total",
@@ -89,7 +97,7 @@ def generate_chart(csv_file=None):
         color="#87CEEB",
     )
     bars_copilot_merged = ax1.bar(
-        x - width / 2,
+        x - width,
         df["copilot_merged"],
         width,
         label="Copilot Merged",
@@ -98,7 +106,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_codex_total = ax1.bar(
-        x + width / 2,
+        x,
         df["codex_total"],
         width,
         label="Codex Total",
@@ -106,12 +114,29 @@ def generate_chart(csv_file=None):
         color="#FFA07A",
     )
     bars_codex_merged = ax1.bar(
-        x + width / 2,
+        x,
         df["codex_merged"],
         width,
         label="Codex Merged",
         alpha=1.0,
         color="#CD5C5C",
+    )
+
+    bars_devin_total = ax1.bar(
+        x + width,
+        df["devin_total"],
+        width,
+        label="Devin Total",
+        alpha=0.7,
+        color="#98FB98",
+    )
+    bars_devin_merged = ax1.bar(
+        x + width,
+        df["devin_merged"],
+        width,
+        label="Devin Merged",
+        alpha=1.0,
+        color="#228B22",
     )
 
     # Line charts for percentages (on secondary y-axis)
@@ -139,6 +164,19 @@ def generate_chart(csv_file=None):
         markerfacecolor="white",
         markeredgewidth=2,
         markeredgecolor="#8B0000",
+    )
+
+    line_devin = ax2.plot(
+        x,
+        df["devin_percentage"],
+        "^-",
+        color="#006400",
+        linewidth=3,
+        markersize=10,
+        label="Devin Success %",
+        markerfacecolor="white",
+        markeredgewidth=2,
+        markeredgecolor="#006400",
     )
 
     # Customize the chart
@@ -195,13 +233,15 @@ def generate_chart(csv_file=None):
     add_value_labels(ax1, bars_copilot_merged)
     add_value_labels(ax1, bars_codex_total)
     add_value_labels(ax1, bars_codex_merged)
+    add_value_labels(ax1, bars_devin_total)
+    add_value_labels(ax1, bars_devin_merged)
 
     # Add percentage labels on line points (with validation)
-    for i, (cop_pct, cod_pct) in enumerate(
-        zip(df["copilot_percentage"], df["codex_percentage"])
+    for i, (cop_pct, cod_pct, dev_pct) in enumerate(
+        zip(df["copilot_percentage"], df["codex_percentage"], df["devin_percentage"])
     ):
         # Only add labels if percentages are valid numbers
-        if pd.notna(cop_pct) and pd.notna(cod_pct):
+        if pd.notna(cop_pct) and pd.notna(cod_pct) and pd.notna(dev_pct):
             ax2.annotate(
                 f"{cop_pct:.1f}%",
                 (i, cop_pct),
@@ -221,6 +261,16 @@ def generate_chart(csv_file=None):
                 fontsize=10,
                 fontweight="bold",
                 color="#8B0000",
+            )
+            ax2.annotate(
+                f"{dev_pct:.1f}%",
+                (i, dev_pct),
+                textcoords="offset points",
+                xytext=(0, -35),
+                ha="center",
+                fontsize=10,
+                fontweight="bold",
+                color="#006400",
             )
 
     plt.tight_layout()
@@ -262,12 +312,15 @@ def update_readme(df):
     # Calculate merge rates
     copilot_rate = latest.copilot_merged / latest.copilot_total * 100
     codex_rate = latest.codex_merged / latest.codex_total * 100
+    devin_rate = latest.devin_merged / latest.devin_total * 100 if latest.devin_total > 0 else 0
 
     # Format numbers with commas
     copilot_total = f"{latest.copilot_total:,}"
     copilot_merged = f"{latest.copilot_merged:,}"
     codex_total = f"{latest.codex_total:,}"
     codex_merged = f"{latest.codex_merged:,}"
+    devin_total = f"{latest.devin_total:,}"
+    devin_merged = f"{latest.devin_merged:,}"
 
     # Create the new table content
     table_content = f"""## Current Statistics
@@ -275,7 +328,8 @@ def update_readme(df):
 | Project | Total PRs | Merged PRs | Merge Rate |
 | ------- | --------- | ---------- | ---------- |
 | Copilot | {copilot_total} | {copilot_merged} | {copilot_rate:.2f}% |
-| Codex   | {codex_total} | {codex_merged} | {codex_rate:.2f}% |"""
+| Codex   | {codex_total} | {codex_merged} | {codex_rate:.2f}% |
+| Devin   | {devin_total} | {devin_merged} | {devin_rate:.2f}% |"""
 
     # Read the current README content
     readme_content = readme_path.read_text()
@@ -308,12 +362,15 @@ def update_github_pages(df):
     # Calculate merge rates
     copilot_rate = latest.copilot_merged / latest.copilot_total * 100
     codex_rate = latest.codex_merged / latest.codex_total * 100
-    
+    devin_rate = latest.devin_merged / latest.devin_total * 100 if latest.devin_total > 0 else 0
+
     # Format numbers with commas
     copilot_total = f"{latest.copilot_total:,}"
     copilot_merged = f"{latest.copilot_merged:,}"
     codex_total = f"{latest.codex_total:,}"
     codex_merged = f"{latest.codex_merged:,}"
+    devin_total = f"{latest.devin_total:,}"
+    devin_merged = f"{latest.devin_merged:,}"
     
     # Current timestamp for last updated
     timestamp = dt.datetime.now().strftime("%B %d, %Y %H:%M UTC")
@@ -331,6 +388,12 @@ def update_github_pages(df):
     index_content = re.sub(
         r'<td>Codex</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
         f'<td>Codex</td>\n                        <td>{codex_total}</td>\n                        <td>{codex_merged}</td>\n                        <td>{codex_rate:.2f}%</td>',
+        index_content
+    )
+    
+    index_content = re.sub(
+        r'<td>Devin</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
+        f'<td>Devin</td>\n                        <td>{devin_total}</td>\n                        <td>{devin_merged}</td>\n                        <td>{devin_rate:.2f}%</td>',
         index_content
     )
     
