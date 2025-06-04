@@ -77,14 +77,14 @@ def generate_chart(csv_file=None):
         axis=1,
     )
 
-    # Adjust chart size based on data points
+    # Adjust chart size based on data points, adding extra space for legends
     num_points = len(df)
     if num_points <= 3:
-        fig_width = max(10, num_points * 4)
-        fig_height = 6
+        fig_width = max(12, num_points * 4)  # Increased from 10 to 12
+        fig_height = 8  # Increased from 6 to 8
     else:
-        fig_width = 14
-        fig_height = 8
+        fig_width = 16  # Increased from 14 to 16
+        fig_height = 10  # Increased from 8 to 10
 
     # Create the combination chart
     fig, ax1 = plt.subplots(figsize=(fig_width, fig_height))
@@ -235,8 +235,9 @@ def generate_chart(csv_file=None):
     ax1.set_xticklabels(timestamps, rotation=45)
 
     # Add legends - move name labels to top left, success % labels to bottom right
-    legend1 = ax1.legend(loc="upper left", bbox_to_anchor=(-0.05, 1.05))
-    legend2 = ax2.legend(loc="lower right", bbox_to_anchor=(1.05, -0.05))
+    # Position legends further outside with more padding
+    legend1 = ax1.legend(loc="upper left", bbox_to_anchor=(-0.15, 1.15))
+    legend2 = ax2.legend(loc="lower right", bbox_to_anchor=(1.15, -0.15))
 
     # Add grid
     ax1.grid(True, alpha=0.3, linestyle="--")
@@ -328,7 +329,10 @@ def generate_chart(csv_file=None):
                     color="#006400",
                 )
 
-    plt.tight_layout(pad=3.0)
+    plt.tight_layout(pad=6.0)
+    
+    # Adjust subplot parameters to ensure legends fit entirely outside the chart
+    plt.subplots_adjust(left=0.2, right=0.85, top=0.85, bottom=0.2)
 
     # Save chart with appropriate DPI for CI environments
     chart_file = Path("chart.png")
