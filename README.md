@@ -17,7 +17,7 @@ Explore the GitHub search queries used:
 
 ---
 
-![chart](chart.png)
+![chart](docs/chart.png)
 
 ## Current Statistics
 

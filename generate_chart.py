@@ -334,18 +334,13 @@ def generate_chart(csv_file=None):
     # Adjust subplot parameters to ensure legends fit entirely outside the chart
     plt.subplots_adjust(left=0.2, right=0.85, top=0.85, bottom=0.2)
 
-    # Save chart with appropriate DPI for CI environments
-    chart_file = Path("chart.png")
+    # Save chart to docs directory (single location for both README and GitHub Pages)
+    docs_dir = Path("docs")
+    docs_dir.mkdir(exist_ok=True)  # Ensure docs directory exists
+    chart_file = docs_dir / "chart.png"
     dpi = 150 if num_points <= 5 else 300
     fig.savefig(chart_file, dpi=dpi, bbox_inches="tight", facecolor="white")
     print(f"Chart generated: {chart_file}")
-    
-    # Also save chart to docs directory for GitHub Pages
-    docs_dir = Path("docs")
-    if docs_dir.exists():
-        docs_chart_file = docs_dir / "chart.png"
-        fig.savefig(docs_chart_file, dpi=dpi, bbox_inches="tight", facecolor="white")
-        print(f"Chart copied to GitHub Pages: {docs_chart_file}")
 
     # Update the README with latest statistics
     update_readme(df)

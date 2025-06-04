@@ -29,4 +29,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: update PR‑approval chart"
-          file_pattern: "data.csv chart.png README.md docs/index.html docs/chart.png"
+          file_pattern: "data.csv README.md docs/index.html docs/chart.png"
