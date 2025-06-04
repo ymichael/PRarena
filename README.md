@@ -10,6 +10,8 @@ Explore the GitHub search queries used:
 - **Merged Copilot PRs**: [is:pr head:copilot/ is:merged](https://github.com/search?q=is:pr+head:copilot/+is:merged&type=pullrequests)
 - **All Codex PRs**: [is:pr head:codex/](https://github.com/search?q=is:pr+head:codex/&type=pullrequests)
 - **Merged Codex PRs**: [is:pr head:codex/ is:merged](https://github.com/search?q=is:pr+head:codex/+is:merged&type=pullrequests)
+- **All Cursor PRs**: [is:pr head:cursor/](https://github.com/search?q=is:pr+head:cursor/&type=pullrequests)
+- **Merged Cursor PRs**: [is:pr head:cursor/ is:merged](https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests)
 - **All Devin PRs**: [author:devin-ai-integration[bot]](https://github.com/search?q=author:devin-ai-integration[bot]&type=pullrequests)
 - **Merged Devin PRs**: [author:devin-ai-integration[bot] is:merged](https://github.com/search?q=author:devin-ai-integration[bot]+is:merged&type=pullrequests)
 
@@ -23,4 +25,5 @@ Explore the GitHub search queries used:
 | ------- | --------- | ---------- | ---------- |
 | Copilot | 12,310 | 4,251 | 34.53% |
 | Codex   | 108,709 | 88,950 | 81.82% |
+| Cursor  | 0 | 0 | 0.00% |
 | Devin   | 27,497 | 16,752 | 60.92% |
