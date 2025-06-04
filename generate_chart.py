@@ -234,9 +234,9 @@ def generate_chart(csv_file=None):
     ax1.set_xticks(x)
     ax1.set_xticklabels(timestamps, rotation=45)
 
-    # Add legends
-    legend1 = ax1.legend(loc="upper left", bbox_to_anchor=(0, 0.95))
-    legend2 = ax2.legend(loc="upper right", bbox_to_anchor=(1, 0.95))
+    # Add legends - move name labels to top left, success % labels to bottom right
+    legend1 = ax1.legend(loc="upper left", bbox_to_anchor=(-0.05, 1.05))
+    legend2 = ax2.legend(loc="lower right", bbox_to_anchor=(1.05, -0.05))
 
     # Add grid
     ax1.grid(True, alpha=0.3, linestyle="--")
@@ -263,8 +263,9 @@ def generate_chart(csv_file=None):
                     label_text,
                     ha="center",
                     va="bottom",
-                    fontsize=9,
-                    fontweight="bold",
+                    fontsize=8,
+                    fontweight="normal",
+                    color="black",
                 )
 
     add_value_labels(ax1, bars_copilot_total)
@@ -276,54 +277,58 @@ def generate_chart(csv_file=None):
     add_value_labels(ax1, bars_devin_total)
     add_value_labels(ax1, bars_devin_merged)
 
-    # Add percentage labels on line points (with validation)
+    # Add percentage labels on line points (with validation and skip 0.0%)
     for i, (cop_pct, cod_pct, cur_pct, dev_pct) in enumerate(
         zip(df["copilot_percentage"], df["codex_percentage"], df["cursor_percentage"], df["devin_percentage"])
     ):
-        # Only add labels if percentages are valid numbers
+        # Only add labels if percentages are valid numbers and not 0.0%
         if pd.notna(cop_pct) and pd.notna(cod_pct) and pd.notna(cur_pct) and pd.notna(dev_pct):
-            ax2.annotate(
-                f"{cop_pct:.1f}%",
-                (i, cop_pct),
-                textcoords="offset points",
-                xytext=(0, 15),
-                ha="center",
-                fontsize=10,
-                fontweight="bold",
-                color="#000080",
-            )
-            ax2.annotate(
-                f"{cod_pct:.1f}%",
-                (i, cod_pct),
-                textcoords="offset points",
-                xytext=(0, -20),
-                ha="center",
-                fontsize=10,
-                fontweight="bold",
-                color="#8B0000",
-            )
-            ax2.annotate(
-                f"{cur_pct:.1f}%",
-                (i, cur_pct),
-                textcoords="offset points",
-                xytext=(0, -35),
-                ha="center",
-                fontsize=10,
-                fontweight="bold",
-                color="#800080",
-            )
-            ax2.annotate(
-                f"{dev_pct:.1f}%",
-                (i, dev_pct),
-                textcoords="offset points",
-                xytext=(0, -50),
-                ha="center",
-                fontsize=10,
-                fontweight="bold",
-                color="#006400",
-            )
+            if cop_pct > 0.0:
+                ax2.annotate(
+                    f"{cop_pct:.1f}%",
+                    (i, cop_pct),
+                    textcoords="offset points",
+                    xytext=(0, 15),
+                    ha="center",
+                    fontsize=10,
+                    fontweight="bold",
+                    color="#000080",
+                )
+            if cod_pct > 0.0:
+                ax2.annotate(
+                    f"{cod_pct:.1f}%",
+                    (i, cod_pct),
+                    textcoords="offset points",
+                    xytext=(0, -20),
+                    ha="center",
+                    fontsize=10,
+                    fontweight="bold",
+                    color="#8B0000",
+                )
+            if cur_pct > 0.0:
+                ax2.annotate(
+                    f"{cur_pct:.1f}%",
+                    (i, cur_pct),
+                    textcoords="offset points",
+                    xytext=(0, -35),
+                    ha="center",
+                    fontsize=10,
+                    fontweight="bold",
+                    color="#800080",
+                )
+            if dev_pct > 0.0:
+                ax2.annotate(
+                    f"{dev_pct:.1f}%",
+                    (i, dev_pct),
+                    textcoords="offset points",
+                    xytext=(0, -50),
+                    ha="center",
+                    fontsize=10,
+                    fontweight="bold",
+                    color="#006400",
+                )
 
-    plt.tight_layout()
+    plt.tight_layout(pad=3.0)
 
     # Save chart with appropriate DPI for CI environments
     chart_file = Path("chart.png")
