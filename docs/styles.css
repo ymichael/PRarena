@@ -152,6 +152,36 @@ a:hover {
     border-color: #0256cc;
 }
 
+.view-btn {
+    padding: 8px 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 20px;
+    background-color: #ffffff;
+    color: #6c757d;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.view-btn:hover {
+    border-color: #28a745;
+    color: #28a745;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.view-btn.active {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.view-btn.active:hover {
+    background-color: #218838;
+    border-color: #218838;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;

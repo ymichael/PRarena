@@ -42,6 +42,14 @@
                         <button id="toggleDevin" class="toggle-btn active" data-agent="devin">Devin</button>
                     </div>
                 </div>
+                <div class="control-group">
+                    <label>Chart View:</label>
+                    <div class="toggle-buttons">
+                        <button id="viewAll" class="view-btn active" data-view="all">All Data</button>
+                        <button id="viewBarsOnly" class="view-btn" data-view="bars">Volume Only</button>
+                        <button id="viewLinesOnly" class="view-btn" data-view="lines">Success Rate Only</button>
+                    </div>
+                </div>
             </div>
             <div class="chart-container">
                 <canvas id="prChart" width="800" height="400"></canvas>
@@ -93,7 +101,7 @@
         </section>
 
         <footer>
-            <p>Last updated: <span id="last-updated">June 04, 2025 20:32 UTC</span></p>
+            <p>Last updated: <span id="last-updated">June 04, 2025 20:37 UTC</span></p>
             <p><a href="https://github.com/aavetis/ai-pr-watcher">View on GitHub</a></p>
         </footer>
     </div>
@@ -166,6 +174,27 @@
                                     } else {
                                         return datasetLabel + ': ' + value.toLocaleString() + ' PRs';
                                     }
+                                },
+                                afterBody: function(context) {
+                                    // Add summary information for the timestamp
+                                    const index = context[0].dataIndex;
+                                    const agents = ['copilot', 'codex', 'cursor', 'devin'];
+                                    let summary = [];
+                                    
+                                    agents.forEach(agent => {
+                                        const totalDataset = chartData.datasets.find(d => d.label === `${agent.charAt(0).toUpperCase() + agent.slice(1)} Total`);
+                                        const mergedDataset = chartData.datasets.find(d => d.label === `${agent.charAt(0).toUpperCase() + agent.slice(1)} Merged`);
+                                        const successDataset = chartData.datasets.find(d => d.label === `${agent.charAt(0).toUpperCase() + agent.slice(1)} Success %`);
+                                        
+                                        if (totalDataset && totalDataset.data[index] > 0) {
+                                            const total = totalDataset.data[index];
+                                            const merged = mergedDataset ? mergedDataset.data[index] : 0;
+                                            const rate = successDataset ? successDataset.data[index] : 0;
+                                            summary.push(`${agent.charAt(0).toUpperCase() + agent.slice(1)}: ${merged.toLocaleString()}/${total.toLocaleString()} (${rate.toFixed(1)}%)`);
+                                        }
+                                    });
+                                    
+                                    return summary.length > 0 ? [' ', 'Summary:', ...summary] : [];
                                 }
                             }
                         }
@@ -216,7 +245,9 @@
         
         function setupToggleButtons() {
             const toggleButtons = document.querySelectorAll('.toggle-btn');
+            const viewButtons = document.querySelectorAll('.view-btn');
             
+            // Agent toggle functionality
             toggleButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const agent = this.dataset.agent;
@@ -225,11 +256,71 @@
                     // Toggle button state
                     this.classList.toggle('active');
                     
+                    // Get current view mode
+                    const activeViewBtn = document.querySelector('.view-btn.active');
+                    const currentView = activeViewBtn ? activeViewBtn.dataset.view : 'all';
+                    
                     // Find and toggle datasets for this agent
                     chartInstance.data.datasets.forEach((dataset, index) => {
                         const labelLower = dataset.label.toLowerCase();
                         if (labelLower.includes(agent)) {
-                            dataset.hidden = isActive; // Hide if was active, show if was inactive
+                            const isLine = dataset.type === 'line';
+                            const isBar = dataset.type === 'bar';
+                            
+                            if (isActive) { // Was active, now hiding
+                                dataset.hidden = true;
+                            } else { // Was hidden, now showing (but respect view mode)
+                                switch(currentView) {
+                                    case 'all':
+                                        dataset.hidden = false;
+                                        break;
+                                    case 'bars':
+                                        dataset.hidden = isLine;
+                                        break;
+                                    case 'lines':
+                                        dataset.hidden = isBar;
+                                        break;
+                                }
+                            }
+                        }
+                    });
+                    
+                    chartInstance.update();
+                });
+            });
+            
+            // View mode functionality
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const view = this.dataset.view;
+                    
+                    // Update button states
+                    viewButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show/hide datasets based on view mode and agent toggles
+                    chartInstance.data.datasets.forEach(dataset => {
+                        const isLine = dataset.type === 'line';
+                        const isBar = dataset.type === 'bar';
+                        
+                        // Get the agent name from the dataset label
+                        const agentMatch = dataset.label.toLowerCase().match(/(copilot|codex|cursor|devin)/);
+                        const agent = agentMatch ? agentMatch[1] : null;
+                        
+                        // Check if agent is currently enabled
+                        const agentButton = document.querySelector(`[data-agent="${agent}"]`);
+                        const agentEnabled = agentButton && agentButton.classList.contains('active');
+                        
+                        switch(view) {
+                            case 'all':
+                                dataset.hidden = !agentEnabled;
+                                break;
+                            case 'bars':
+                                dataset.hidden = !agentEnabled || isLine;
+                                break;
+                            case 'lines':
+                                dataset.hidden = !agentEnabled || isBar;
+                                break;
                         }
                     });
                     
