@@ -77,6 +77,81 @@ a:hover {
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
 }
 
+/* Interactive Chart Styles */
+.chart-container {
+    position: relative;
+    height: 400px;
+    margin: 20px 0;
+    display: none; /* Hidden by default, shown by JavaScript */
+}
+
+.chart-fallback {
+    display: none; /* Hidden by default, shown only if chart fails */
+}
+
+.chart-fallback p {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.chart-controls {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    display: none; /* Hidden by default, shown by JavaScript */
+}
+
+.control-group {
+    margin-bottom: 10px;
+}
+
+.control-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+.toggle-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.toggle-btn {
+    padding: 8px 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 20px;
+    background-color: #ffffff;
+    color: #6c757d;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.toggle-btn:hover {
+    border-color: #0366d6;
+    color: #0366d6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn.active {
+    background-color: #0366d6;
+    border-color: #0366d6;
+    color: white;
+}
+
+.toggle-btn.active:hover {
+    background-color: #0256cc;
+    border-color: #0256cc;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -127,5 +202,18 @@ footer {
     
     th, td {
         padding: 8px 10px;
+    }
+    
+    .chart-container {
+        height: 300px;
+    }
+    
+    .toggle-buttons {
+        justify-content: center;
+    }
+    
+    .toggle-btn {
+        padding: 6px 12px;
+        font-size: 13px;
     }
 }

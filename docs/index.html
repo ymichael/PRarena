@@ -6,6 +6,7 @@
     <title>PR Analytics: Volume vs Success Rate</title>
     <link rel="stylesheet" href="styles.css">
     <meta http-equiv="refresh" content="3600"> <!-- Auto-refresh every hour -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 </head>
 <body>
     <div class="container">
@@ -31,7 +32,24 @@
 
         <section class="chart">
             <h2>PR Analytics Chart</h2>
-            <img src="chart.png" alt="PR Analytics Chart" class="chart-image">
+            <div class="chart-controls">
+                <div class="control-group">
+                    <label>Toggle Data Series:</label>
+                    <div class="toggle-buttons">
+                        <button id="toggleCopilot" class="toggle-btn active" data-agent="copilot">Copilot</button>
+                        <button id="toggleCodex" class="toggle-btn active" data-agent="codex">Codex</button>
+                        <button id="toggleCursor" class="toggle-btn active" data-agent="cursor">Cursor</button>
+                        <button id="toggleDevin" class="toggle-btn active" data-agent="devin">Devin</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="prChart" width="800" height="400"></canvas>
+            </div>
+            <div class="chart-fallback">
+                <img src="chart.png" alt="PR Analytics Chart" class="chart-image">
+                <p><em>Interactive chart failed to load. Showing static version.</em></p>
+            </div>
         </section>
 
         <section class="statistics">
@@ -75,9 +93,155 @@
         </section>
 
         <footer>
-            <p>Last updated: <span id="last-updated">June 04, 2025 20:30 UTC</span></p>
+            <p>Last updated: <span id="last-updated">June 04, 2025 20:32 UTC</span></p>
             <p><a href="https://github.com/aavetis/ai-pr-watcher">View on GitHub</a></p>
         </footer>
     </div>
+    <script>
+        // Load chart data and create interactive chart
+        let chartInstance = null;
+        let chartData = null;
+        
+        async function loadChartData() {
+            try {
+                const response = await fetch('chart-data.json');
+                chartData = await response.json();
+                initializeChart();
+            } catch (error) {
+                console.error('Failed to load chart data:', error);
+                showFallback();
+            }
+        }
+        
+        function showFallback() {
+            document.querySelector('.chart-container').style.display = 'none';
+            document.querySelector('.chart-controls').style.display = 'none';
+            document.querySelector('.chart-fallback').style.display = 'block';
+        }
+        
+        function initializeChart() {
+            const ctx = document.getElementById('prChart').getContext('2d');
+            
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'PR Volume vs Success Rate',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'right',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'rect',
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return 'Time: ' + context[0].label;
+                                },
+                                label: function(context) {
+                                    const datasetLabel = context.dataset.label;
+                                    const value = context.parsed.y;
+                                    
+                                    if (datasetLabel.includes('Success %')) {
+                                        return datasetLabel + ': ' + value.toFixed(1) + '%';
+                                    } else {
+                                        return datasetLabel + ': ' + value.toLocaleString() + ' PRs';
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Number of PRs'
+                            },
+                            beginAtZero: true
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Success Rate (%)'
+                            },
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    }
+                }
+            });
+            
+            // Hide fallback and show interactive chart
+            document.querySelector('.chart-fallback').style.display = 'none';
+            document.querySelector('.chart-container').style.display = 'block';
+            document.querySelector('.chart-controls').style.display = 'block';
+            
+            // Set up toggle functionality
+            setupToggleButtons();
+        }
+        
+        function setupToggleButtons() {
+            const toggleButtons = document.querySelectorAll('.toggle-btn');
+            
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const agent = this.dataset.agent;
+                    const isActive = this.classList.contains('active');
+                    
+                    // Toggle button state
+                    this.classList.toggle('active');
+                    
+                    // Find and toggle datasets for this agent
+                    chartInstance.data.datasets.forEach((dataset, index) => {
+                        const labelLower = dataset.label.toLowerCase();
+                        if (labelLower.includes(agent)) {
+                            dataset.hidden = isActive; // Hide if was active, show if was inactive
+                        }
+                    });
+                    
+                    chartInstance.update();
+                });
+            });
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadChartData();
+        });
+    </script>
 </body>
 </html>
