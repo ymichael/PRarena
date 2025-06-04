@@ -77,14 +77,14 @@ def generate_chart(csv_file=None):
         axis=1,
     )
 
-    # Adjust chart size based on data points
+    # Adjust chart size based on data points, adding extra space for legends
     num_points = len(df)
     if num_points <= 3:
-        fig_width = max(10, num_points * 4)
-        fig_height = 6
+        fig_width = max(12, num_points * 4)  # Increased from 10 to 12
+        fig_height = 8  # Increased from 6 to 8
     else:
-        fig_width = 14
-        fig_height = 8
+        fig_width = 16  # Increased from 14 to 16
+        fig_height = 10  # Increased from 8 to 10
 
     # Create the combination chart
     fig, ax1 = plt.subplots(figsize=(fig_width, fig_height))
@@ -234,9 +234,10 @@ def generate_chart(csv_file=None):
     ax1.set_xticks(x)
     ax1.set_xticklabels(timestamps, rotation=45)
 
-    # Add legends
-    legend1 = ax1.legend(loc="upper left", bbox_to_anchor=(0, 0.95))
-    legend2 = ax2.legend(loc="upper right", bbox_to_anchor=(1, 0.95))
+    # Add legends - move name labels to top left, success % labels to bottom right
+    # Position legends further outside with more padding
+    legend1 = ax1.legend(loc="upper left", bbox_to_anchor=(-0.15, 1.15))
+    legend2 = ax2.legend(loc="lower right", bbox_to_anchor=(1.15, -0.15))
 
     # Add grid
     ax1.grid(True, alpha=0.3, linestyle="--")
@@ -263,8 +264,9 @@ def generate_chart(csv_file=None):
                     label_text,
                     ha="center",
                     va="bottom",
-                    fontsize=9,
-                    fontweight="bold",
+                    fontsize=8,
+                    fontweight="normal",
+                    color="black",
                 )
 
     add_value_labels(ax1, bars_copilot_total)
@@ -276,67 +278,69 @@ def generate_chart(csv_file=None):
     add_value_labels(ax1, bars_devin_total)
     add_value_labels(ax1, bars_devin_merged)
 
-    # Add percentage labels on line points (with validation)
+    # Add percentage labels on line points (with validation and skip 0.0%)
     for i, (cop_pct, cod_pct, cur_pct, dev_pct) in enumerate(
         zip(df["copilot_percentage"], df["codex_percentage"], df["cursor_percentage"], df["devin_percentage"])
     ):
-        # Only add labels if percentages are valid numbers
+        # Only add labels if percentages are valid numbers and not 0.0%
         if pd.notna(cop_pct) and pd.notna(cod_pct) and pd.notna(cur_pct) and pd.notna(dev_pct):
-            ax2.annotate(
-                f"{cop_pct:.1f}%",
-                (i, cop_pct),
-                textcoords="offset points",
-                xytext=(0, 15),
-                ha="center",
-                fontsize=10,
-                fontweight="bold",
-                color="#000080",
-            )
-            ax2.annotate(
-                f"{cod_pct:.1f}%",
-                (i, cod_pct),
-                textcoords="offset points",
-                xytext=(0, -20),
-                ha="center",
-                fontsize=10,
-                fontweight="bold",
-                color="#8B0000",
-            )
-            ax2.annotate(
-                f"{cur_pct:.1f}%",
-                (i, cur_pct),
-                textcoords="offset points",
-                xytext=(0, -35),
-                ha="center",
-                fontsize=10,
-                fontweight="bold",
-                color="#800080",
-            )
-            ax2.annotate(
-                f"{dev_pct:.1f}%",
-                (i, dev_pct),
-                textcoords="offset points",
-                xytext=(0, -50),
-                ha="center",
-                fontsize=10,
-                fontweight="bold",
-                color="#006400",
-            )
+            if cop_pct > 0.0:
+                ax2.annotate(
+                    f"{cop_pct:.1f}%",
+                    (i, cop_pct),
+                    textcoords="offset points",
+                    xytext=(0, 15),
+                    ha="center",
+                    fontsize=10,
+                    fontweight="bold",
+                    color="#000080",
+                )
+            if cod_pct > 0.0:
+                ax2.annotate(
+                    f"{cod_pct:.1f}%",
+                    (i, cod_pct),
+                    textcoords="offset points",
+                    xytext=(0, -20),
+                    ha="center",
+                    fontsize=10,
+                    fontweight="bold",
+                    color="#8B0000",
+                )
+            if cur_pct > 0.0:
+                ax2.annotate(
+                    f"{cur_pct:.1f}%",
+                    (i, cur_pct),
+                    textcoords="offset points",
+                    xytext=(0, -35),
+                    ha="center",
+                    fontsize=10,
+                    fontweight="bold",
+                    color="#800080",
+                )
+            if dev_pct > 0.0:
+                ax2.annotate(
+                    f"{dev_pct:.1f}%",
+                    (i, dev_pct),
+                    textcoords="offset points",
+                    xytext=(0, -50),
+                    ha="center",
+                    fontsize=10,
+                    fontweight="bold",
+                    color="#006400",
+                )
 
-    plt.tight_layout()
+    plt.tight_layout(pad=6.0)
+    
+    # Adjust subplot parameters to ensure legends fit entirely outside the chart
+    plt.subplots_adjust(left=0.2, right=0.85, top=0.85, bottom=0.2)
 
-    # Save chart with appropriate DPI for CI environments
-    chart_file = Path("chart.png")
+    # Save chart to docs directory (single location for both README and GitHub Pages)
+    docs_dir = Path("docs")
+    docs_dir.mkdir(exist_ok=True)  # Ensure docs directory exists
+    chart_file = docs_dir / "chart.png"
     dpi = 150 if num_points <= 5 else 300
     fig.savefig(chart_file, dpi=dpi, bbox_inches="tight", facecolor="white")
     print(f"Chart generated: {chart_file}")
-    
-    # Also save chart to docs directory for GitHub Pages
-    docs_dir = Path("docs")
-    if docs_dir.exists():
-        docs_chart_file = docs_dir / "chart.png"
-        fig.savefig(docs_chart_file, dpi=dpi, bbox_inches="tight", facecolor="white")
-        print(f"Chart copied to GitHub Pages: {docs_chart_file}")
 
     # Update the README with latest statistics
     update_readme(df)
