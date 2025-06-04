@@ -20,6 +20,8 @@ Q = {
     "is:pr+head:copilot/+is:merged":    "copilot_merged",
     "is:pr+head:codex/":                "codex_total",
     "is:pr+head:codex/+is:merged":      "codex_merged",
+    "is:pr+head:cursor/":               "cursor_total",
+    "is:pr+head:cursor/+is:merged":     "cursor_merged",
     "author:devin-ai-integration[bot]": "devin_total",
     "author:devin-ai-integration[bot]+is:merged": "devin_merged",
 }
@@ -36,7 +38,8 @@ def collect_data():
     # Save data to CSV
     timestamp = dt.datetime.now(dt.UTC).strftime("%Y‑%m‑%d %H:%M:%S")
     row = [timestamp, cnt["copilot_total"], cnt["copilot_merged"],
-           cnt["codex_total"], cnt["codex_merged"], cnt["devin_total"], cnt["devin_merged"]]
+           cnt["codex_total"], cnt["codex_merged"], cnt["cursor_total"], cnt["cursor_merged"], 
+           cnt["devin_total"], cnt["devin_merged"]]
 
     csv_file = Path("data.csv")
     is_new_file = not csv_file.exists()
@@ -44,7 +47,8 @@ def collect_data():
         writer = csv.writer(f)
         if is_new_file:
             writer.writerow(["timestamp", "copilot_total", "copilot_merged",
-                            "codex_total", "codex_merged", "devin_total", "devin_merged"])
+                            "codex_total", "codex_merged", "cursor_total", "cursor_merged",
+                            "devin_total", "devin_merged"])
         writer.writerow(row)
 
     return csv_file
