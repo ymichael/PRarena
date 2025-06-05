@@ -1,0 +1,254 @@
+{
+  "labels": [
+    "05/26 14:21",
+    "05/27 18:00",
+    "05/29 06:01",
+    "05/30 21:00",
+    "06/01 09:01",
+    "06/02 18:01",
+    "06/04 09:01",
+    "06/05 19:56"
+  ],
+  "datasets": [
+    {
+      "label": "Copilot Total",
+      "type": "bar",
+      "data": [
+        8729,
+        9276,
+        9826,
+        10340,
+        10949,
+        11507,
+        12180,
+        12880
+      ],
+      "backgroundColor": "#87CEEB",
+      "borderColor": "#87CEEB",
+      "borderWidth": 1,
+      "yAxisID": "y",
+      "order": 2
+    },
+    {
+      "label": "Copilot Merged",
+      "type": "bar",
+      "data": [
+        1594,
+        1932,
+        2342,
+        2788,
+        3215,
+        3716,
+        4178,
+        4571
+      ],
+      "backgroundColor": "#4682B4",
+      "borderColor": "#4682B4",
+      "borderWidth": 1,
+      "yAxisID": "y",
+      "order": 2
+    },
+    {
+      "label": "Copilot Success %",
+      "type": "line",
+      "data": [
+        18.260969183182496,
+        20.827943078913325,
+        23.834724201099124,
+        26.963249516441007,
+        29.363412183761074,
+        32.29338663422265,
+        34.30213464696224,
+        35.48913043478261
+      ],
+      "borderColor": "#000080",
+      "backgroundColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 3,
+      "pointRadius": 6,
+      "pointHoverRadius": 8,
+      "fill": false,
+      "yAxisID": "y1",
+      "order": 1
+    },
+    {
+      "label": "Codex Total",
+      "type": "bar",
+      "data": [
+        54211,
+        58600,
+        66209,
+        72199,
+        74239,
+        78795,
+        99685,
+        142577
+      ],
+      "backgroundColor": "#FFA07A",
+      "borderColor": "#FFA07A",
+      "borderWidth": 1,
+      "yAxisID": "y",
+      "order": 2
+    },
+    {
+      "label": "Codex Merged",
+      "type": "bar",
+      "data": [
+        44230,
+        48092,
+        54888,
+        60014,
+        61672,
+        65647,
+        81911,
+        116754
+      ],
+      "backgroundColor": "#CD5C5C",
+      "borderColor": "#CD5C5C",
+      "borderWidth": 1,
+      "yAxisID": "y",
+      "order": 2
+    },
+    {
+      "label": "Codex Success %",
+      "type": "line",
+      "data": [
+        81.58860747818709,
+        82.06825938566553,
+        82.90111616245525,
+        83.12303494508234,
+        83.07223965840058,
+        83.31366203439305,
+        82.1698349801876,
+        81.88838311929693
+      ],
+      "borderColor": "#8B0000",
+      "backgroundColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 3,
+      "pointRadius": 6,
+      "pointHoverRadius": 8,
+      "fill": false,
+      "yAxisID": "y1",
+      "order": 1
+    },
+    {
+      "label": "Cursor Total",
+      "type": "bar",
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        345
+      ],
+      "backgroundColor": "#DDA0DD",
+      "borderColor": "#DDA0DD",
+      "borderWidth": 1,
+      "yAxisID": "y",
+      "order": 2
+    },
+    {
+      "label": "Cursor Merged",
+      "type": "bar",
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        255
+      ],
+      "backgroundColor": "#9370DB",
+      "borderColor": "#9370DB",
+      "borderWidth": 1,
+      "yAxisID": "y",
+      "order": 2
+    },
+    {
+      "label": "Cursor Success %",
+      "type": "line",
+      "data": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        73.91304347826086
+      ],
+      "borderColor": "#800080",
+      "backgroundColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 3,
+      "pointRadius": 6,
+      "pointHoverRadius": 8,
+      "fill": false,
+      "yAxisID": "y1",
+      "order": 1
+    },
+    {
+      "label": "Devin Total",
+      "type": "bar",
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        27386,
+        27452,
+        27679
+      ],
+      "backgroundColor": "#98FB98",
+      "borderColor": "#98FB98",
+      "borderWidth": 1,
+      "yAxisID": "y",
+      "order": 2
+    },
+    {
+      "label": "Devin Merged",
+      "type": "bar",
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        16746,
+        16715,
+        16870
+      ],
+      "backgroundColor": "#228B22",
+      "borderColor": "#228B22",
+      "borderWidth": 1,
+      "yAxisID": "y",
+      "order": 2
+    },
+    {
+      "label": "Devin Success %",
+      "type": "line",
+      "data": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        61.14803184108669,
+        60.88809558502113,
+        60.948733697026626
+      ],
+      "borderColor": "#006400",
+      "backgroundColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 3,
+      "pointRadius": 6,
+      "pointHoverRadius": 8,
+      "fill": false,
+      "yAxisID": "y1",
+      "order": 1
+    }
+  ]
+}

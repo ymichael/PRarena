@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import datetime as dt
 import re
+import json
 
 
 def generate_chart(csv_file=None):
@@ -342,12 +343,91 @@ def generate_chart(csv_file=None):
     fig.savefig(chart_file, dpi=dpi, bbox_inches="tight", facecolor="white")
     print(f"Chart generated: {chart_file}")
 
+    # Export chart data as JSON for interactive chart
+    export_chart_data_json(df)
+
     # Update the README with latest statistics
     update_readme(df)
     
     # Update the GitHub Pages with latest statistics
     update_github_pages(df)
 
+    return True
+
+
+def export_chart_data_json(df):
+    """Export chart data as JSON for interactive JavaScript chart"""
+    docs_dir = Path("docs")
+    docs_dir.mkdir(exist_ok=True)
+    
+    # Prepare data for Chart.js
+    chart_data = {
+        "labels": [],
+        "datasets": []
+    }
+    
+    # Format timestamps for labels
+    for _, row in df.iterrows():
+        timestamp = row["timestamp"]
+        if isinstance(timestamp, str):
+            timestamp = pd.to_datetime(timestamp)
+        chart_data["labels"].append(timestamp.strftime("%m/%d %H:%M"))
+    
+    # Color scheme matching the Python chart
+    colors = {
+        "copilot": {"total": "#87CEEB", "merged": "#4682B4", "line": "#000080"},
+        "codex": {"total": "#FFA07A", "merged": "#CD5C5C", "line": "#8B0000"},
+        "cursor": {"total": "#DDA0DD", "merged": "#9370DB", "line": "#800080"},
+        "devin": {"total": "#98FB98", "merged": "#228B22", "line": "#006400"}
+    }
+    
+    # Add bar datasets for totals and merged PRs
+    for agent in ["copilot", "codex", "cursor", "devin"]:
+        # Total PRs
+        chart_data["datasets"].append({
+            "label": f"{agent.title()} Total",
+            "type": "bar",
+            "data": df[f"{agent}_total"].tolist(),
+            "backgroundColor": colors[agent]["total"],
+            "borderColor": colors[agent]["total"],
+            "borderWidth": 1,
+            "yAxisID": "y",
+            "order": 2
+        })
+        
+        # Merged PRs
+        chart_data["datasets"].append({
+            "label": f"{agent.title()} Merged",
+            "type": "bar",
+            "data": df[f"{agent}_merged"].tolist(),
+            "backgroundColor": colors[agent]["merged"],
+            "borderColor": colors[agent]["merged"],
+            "borderWidth": 1,
+            "yAxisID": "y",
+            "order": 2
+        })
+        
+        # Success rate line
+        chart_data["datasets"].append({
+            "label": f"{agent.title()} Success %",
+            "type": "line",
+            "data": df[f"{agent}_percentage"].tolist(),
+            "borderColor": colors[agent]["line"],
+            "backgroundColor": "rgba(255, 255, 255, 0.8)",
+            "borderWidth": 3,
+            "pointRadius": 6,
+            "pointHoverRadius": 8,
+            "fill": False,
+            "yAxisID": "y1",
+            "order": 1
+        })
+    
+    # Write JSON file
+    json_file = docs_dir / "chart-data.json"
+    with open(json_file, "w") as f:
+        json.dump(chart_data, f, indent=2)
+    
+    print(f"Chart data exported: {json_file}")
     return True
 
 
