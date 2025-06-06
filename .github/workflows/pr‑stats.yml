@@ -30,5 +30,6 @@ jobs:
         with:
           commit_message: "chore: update PR‑approval chart"
           file_pattern: "data.csv README.md docs/index.html docs/chart.png docs/chart-data.json"
+          commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
           commit_user_name: 'github-actions[bot]'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
