@@ -14,6 +14,8 @@ Explore the GitHub search queries used:
 - **Merged Cursor PRs**: [is:pr head:cursor/ is:merged](https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests)
 - **All Devin PRs**: [author:devin-ai-integration[bot]](https://github.com/search?q=author:devin-ai-integration[bot]&type=pullrequests)
 - **Merged Devin PRs**: [author:devin-ai-integration[bot] is:merged](https://github.com/search?q=author:devin-ai-integration[bot]+is:merged&type=pullrequests)
+- **All Codegen PRs**: [author:codegen-sh[bot]](https://github.com/search?q=author:codegen-sh[bot]&type=pullrequests)
+- **Merged Codegen PRs**: [author:codegen-sh[bot] is:merged](https://github.com/search?q=author:codegen-sh[bot]+is:merged&type=pullrequests)
 
 ---
 
@@ -27,3 +29,4 @@ Explore the GitHub search queries used:
 | Codex   | 207,899 | 173,018 | 83.22% |
 | Cursor  | 704 | 543 | 77.13% |
 | Devin   | 27,888 | 16,967 | 60.84% |
+| Codegen | 0 | 0 | 0.00% |

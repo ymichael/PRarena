@@ -185,6 +185,43 @@
                 <span id="devin-rate">{{DEVIN_RATE}}</span>
               </td>
             </tr>
+            <tr data-agent="codegen">
+              <td class="agent-cell">
+                <div class="agent-info">
+                  <span
+                    class="agent-icon"
+                    style="background-color: #daa520"
+                  ></span>
+                  <a
+                    href="https://github.com/codegen-sh"
+                    target="_blank"
+                    class="agent-link"
+                    >Codegen</a
+                  >
+                </div>
+              </td>
+              <td class="metric-cell">
+                <a
+                  href="https://github.com/search?q=author:codegen-sh[bot]&type=pullrequests"
+                  target="_blank"
+                  class="metric-link"
+                >
+                  <span id="codegen-total">{{CODEGEN_TOTAL}}</span>
+                </a>
+              </td>
+              <td class="metric-cell">
+                <a
+                  href="https://github.com/search?q=author:codegen-sh[bot]+is:merged&type=pullrequests"
+                  target="_blank"
+                  class="metric-link"
+                >
+                  <span id="codegen-merged">{{CODEGEN_MERGED}}</span>
+                </a>
+              </td>
+              <td class="rate-cell">
+                <span id="codegen-rate">{{CODEGEN_RATE}}</span>
+              </td>
+            </tr>
           </tbody>
         </table>
       </section>
@@ -240,6 +277,17 @@
                   ></span
                   >Devin
                 </button>
+                <button
+                  id="toggleCodegen"
+                  class="toggle-btn active"
+                  data-agent="codegen"
+                >
+                  <span
+                    class="toggle-icon"
+                    style="background-color: #daa520"
+                  ></span
+                  >Codegen
+                </button>
               </div>
             </div>
             <div class="control-section">
@@ -271,7 +319,7 @@
 
       <footer>
         <p>
-          Last updated: <span id="last-updated">June 09, 2025 00:02 UTC</span>
+          Last updated: <span id="last-updated">June 09, 2025 00:48 UTC</span>
         </p>
         <p>
           <a href="https://github.com/aavetis/ai-pr-watcher">View on GitHub</a>
@@ -406,7 +454,7 @@
         // Get the latest data point (last index)
         const latestIndex = chartData.labels.length - 1;
 
-        const agents = ["copilot", "codex", "cursor", "devin"];
+        const agents = ["copilot", "codex", "cursor", "devin", "codegen"];
 
         agents.forEach((agent) => {
           // Find datasets for this agent
@@ -506,7 +554,7 @@
               // Get the agent name from the dataset label
               const agentMatch = dataset.label
                 .toLowerCase()
-                .match(/(copilot|codex|cursor|devin)/);
+                .match(/(copilot|codex|cursor|devin|codegen)/);
               const agent = agentMatch ? agentMatch[1] : null;
 
               // Check if agent is currently enabled

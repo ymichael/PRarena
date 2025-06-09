@@ -22,6 +22,8 @@ Q = {
     "is:pr+head:cursor/+is:merged": "cursor_merged",
     "author:devin-ai-integration[bot]": "devin_total",
     "author:devin-ai-integration[bot]+is:merged": "devin_merged",
+    "author:codegen-sh[bot]": "codegen_total",
+    "author:codegen-sh[bot]+is:merged": "codegen_merged",
 }
 
 
@@ -49,6 +51,8 @@ def collect_data():
         cnt["cursor_merged"],
         cnt["devin_total"],
         cnt["devin_merged"],
+        cnt["codegen_total"],
+        cnt["codegen_merged"],
     ]
 
     csv_file = Path("data.csv")
@@ -67,6 +71,8 @@ def collect_data():
                     "cursor_merged",
                     "devin_total",
                     "devin_merged",
+                    "codegen_total",
+                    "codegen_merged",
                 ]
             )
         writer.writerow(row)
