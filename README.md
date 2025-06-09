@@ -29,3 +29,4 @@ Explore the GitHub search queries used:
 | Codex   | 207,899 | 173,018 | 83.22% |
 | Cursor  | 704 | 543 | 77.13% |
 | Devin   | 27,888 | 16,967 | 60.84% |
+| Codegen | 0 | 0 | 0.00% |

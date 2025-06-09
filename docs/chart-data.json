@@ -249,6 +249,66 @@
       "fill": false,
       "yAxisID": "y1",
       "order": 1
+    },
+    {
+      "label": "Codegen Total",
+      "type": "bar",
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "backgroundColor": "#FFE4B5",
+      "borderColor": "#FFE4B5",
+      "borderWidth": 1,
+      "yAxisID": "y",
+      "order": 2
+    },
+    {
+      "label": "Codegen Merged",
+      "type": "bar",
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "backgroundColor": "#DAA520",
+      "borderColor": "#DAA520",
+      "borderWidth": 1,
+      "yAxisID": "y",
+      "order": 2
+    },
+    {
+      "label": "Codegen Success %",
+      "type": "line",
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "borderColor": "#B8860B",
+      "backgroundColor": "rgba(255, 255, 255, 0.8)",
+      "borderWidth": 3,
+      "pointRadius": 6,
+      "pointHoverRadius": 8,
+      "fill": false,
+      "yAxisID": "y1",
+      "order": 1
     }
   ]
 }
