@@ -435,11 +435,30 @@ def export_chart_data_json(df):
     
     # Add bar datasets for totals and merged PRs
     for agent in ["copilot", "codex", "cursor", "devin", "codegen"]:
+        # Process data to replace leading zeros with None (null in JSON)
+        total_data = df[f"{agent}_total"].tolist()
+        merged_data = df[f"{agent}_merged"].tolist()
+        percentage_data = df[f"{agent}_percentage"].tolist()
+        
+        # Find first non-zero total value index
+        first_nonzero_idx = None
+        for i, total in enumerate(total_data):
+            if total > 0:
+                first_nonzero_idx = i
+                break
+        
+        # Replace leading zeros with None
+        if first_nonzero_idx is not None:
+            for i in range(first_nonzero_idx):
+                total_data[i] = None
+                merged_data[i] = None
+                percentage_data[i] = None
+        
         # Total PRs
         chart_data["datasets"].append({
             "label": f"{agent.title()} Total",
             "type": "bar",
-            "data": df[f"{agent}_total"].tolist(),
+            "data": total_data,
             "backgroundColor": colors[agent]["total"],
             "borderColor": colors[agent]["total"],
             "borderWidth": 1,
@@ -451,7 +470,7 @@ def export_chart_data_json(df):
         chart_data["datasets"].append({
             "label": f"{agent.title()} Merged",
             "type": "bar",
-            "data": df[f"{agent}_merged"].tolist(),
+            "data": merged_data,
             "backgroundColor": colors[agent]["merged"],
             "borderColor": colors[agent]["merged"],
             "borderWidth": 1,
@@ -463,12 +482,12 @@ def export_chart_data_json(df):
         chart_data["datasets"].append({
             "label": f"{agent.title()} Success %",
             "type": "line",
-            "data": df[f"{agent}_percentage"].tolist(),
+            "data": percentage_data,
             "borderColor": colors[agent]["line"],
             "backgroundColor": "rgba(255, 255, 255, 0.8)",
             "borderWidth": 3,
-            "pointRadius": 6,
-            "pointHoverRadius": 8,
+            "pointRadius": 3,
+            "pointHoverRadius": 5,
             "fill": False,
             "yAxisID": "y1",
             "order": 1
