@@ -14,6 +14,8 @@ Explore the GitHub search queries used:
 - **Merged Cursor PRs**: [is:pr head:cursor/ is:merged](https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests)
 - **All Devin PRs**: [author:devin-ai-integration[bot]](https://github.com/search?q=author:devin-ai-integration[bot]&type=pullrequests)
 - **Merged Devin PRs**: [author:devin-ai-integration[bot] is:merged](https://github.com/search?q=author:devin-ai-integration[bot]+is:merged&type=pullrequests)
+- **All Codegen PRs**: [author:codegen-sh[bot]](https://github.com/search?q=author:codegen-sh[bot]&type=pullrequests)
+- **Merged Codegen PRs**: [author:codegen-sh[bot] is:merged](https://github.com/search?q=author:codegen-sh[bot]+is:merged&type=pullrequests)
 
 ---
 
