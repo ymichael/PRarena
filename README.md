@@ -25,8 +25,8 @@ Explore the GitHub search queries used:
 
 | Project | Total PRs | Merged PRs | Merge Rate |
 | ------- | --------- | ---------- | ---------- |
-| Copilot | 16,397 | 8,364 | 51.01% |
-| Codex   | 338,382 | 286,750 | 84.74% |
-| Cursor  | 1,226 | 926 | 75.53% |
-| Devin   | 28,750 | 17,553 | 61.05% |
-| Codegen | 4,091 | 1,707 | 41.73% |
+| Copilot | 16,448 | 8,406 | 51.11% |
+| Codex   | 339,735 | 287,933 | 84.75% |
+| Cursor  | 1,233 | 930 | 75.43% |
+| Devin   | 28,785 | 17,570 | 61.04% |
+| Codegen | 4,086 | 1,703 | 41.68% |
