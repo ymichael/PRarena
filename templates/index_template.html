@@ -36,7 +36,7 @@
               <th class="rate-col">Success Rate</th>
             </tr>
           </thead>
-          
+
           <tbody>
 {% for agent in agents %}
             <tr data-agent="{{ agent.key }}">
@@ -243,7 +243,8 @@
         // Get the latest data point (last index)
         const latestIndex = chartData.labels.length - 1;
 
-        const agents = ["copilot", "codex", "cursor", "devin", "codegen"];
+        // Dynamically generated from server-side AGENTS list
+        const agents = {{ AGENTS | tojson | safe }};
 
         agents.forEach((agent) => {
           // Find datasets for this agent
