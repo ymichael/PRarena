@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# PR‑tracker: counts Copilot / Codex PRs and saves data to CSV.
-# Tracks merged PRs (not just approved ones)
-# deps: requests
-
 import csv
 import datetime as dt
 import re
