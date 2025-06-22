@@ -250,12 +250,12 @@
           // Find datasets for this agent
           const totalDataset = chartData.datasets.find(
             (d) =>
-              d.label.toLowerCase().includes(agent) &&
+              d.label.toLowerCase().includes(agent.key) &&
               d.label.toLowerCase().includes("total")
           );
           const mergedDataset = chartData.datasets.find(
             (d) =>
-              d.label.toLowerCase().includes(agent) &&
+              d.label.toLowerCase().includes(agent.key) &&
               d.label.toLowerCase().includes("merged")
           );
 
