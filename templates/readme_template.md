@@ -19,8 +19,5 @@ Explore the GitHub search queries used:
 ## Current Statistics
 
 | Project | Total PRs | Merged PRs | Merge Rate |
-| ------- | --------- | ---------- | ---------- |
-
-{% for agent in agents -%}
-| {{ agent.display }} | {{ stats[agent.key].total | comma }} | {{ stats[agent.key].merged | comma }} | {{ stats[agent.key].rate | round(2) }}% |
-{% endfor %}
+| ------- | --------- | ---------- | ---------- |{%- for agent in agents %}
+| {{ agent.display }} | {{ stats[agent.key].total | comma }} | {{ stats[agent.key].merged | comma }} | {{ stats[agent.key].rate | round(2) }}% |{%- endfor %}
