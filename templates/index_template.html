@@ -244,7 +244,7 @@
         const latestIndex = chartData.labels.length - 1;
 
         // Dynamically generated from server-side AGENTS list
-        const agents = {{ AGENTS | tojson | safe }};
+        const agents = {{ agents | tojson | safe }};
 
         agents.forEach((agent) => {
           // Find datasets for this agent
