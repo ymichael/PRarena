@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Coding Agents</title>
+    <link rel="stylesheet" href="styles.css" />
+    <meta http-equiv="refresh" content="3600" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header class="hero">
+        <h1>AI Coding Agents</h1>
+        <p>Which AI writes the most successful code?</p>
+      </header>
+
+      <!-- Simple Leaderboard -->
+      <section class="leaderboard">
+        {% for agent in agents %}
+        <div class="agent" data-success-rate="{{ stats[agent.key].rate }}">
+          <div class="agent-header">
+            <div class="rank">#{{ loop.index }}</div>
+            <div
+              class="agent-dot"
+              style="background-color: {{ agent.color }}"
+            ></div>
+            <div class="agent-info">
+              <h3>
+                <a href="{{ agent.info_url }}" target="_blank"
+                  >{{ agent.long_name }}</a
+                >
+              </h3>
+              <span class="agent-subtitle"
+                >{{ stats[agent.key].total | comma }} PRs</span
+              >
+            </div>
+          </div>
+          <div class="metrics">
+            <div class="primary-metric">
+              <span class="metric-value"
+                >{{ stats[agent.key].rate | round(1) }}%</span
+              >
+              <span class="metric-label">Success Rate</span>
+            </div>
+            <div class="secondary-metrics">
+              <div class="metric">
+                <a href="{{ agent.merged_query_url }}" target="_blank"
+                  >{{ stats[agent.key].merged | comma }}</a
+                >
+                <span>merged</span>
+              </div>
+            </div>
+          </div>
+          <div class="progress-bar">
+            <div
+              class="progress"
+              style="width: {{ stats[agent.key].rate }}%; background-color: {{ agent.color }}"
+            ></div>
+          </div>
+        </div>
+        {% endfor %}
+      </section>
+
+      <!-- Simple Chart -->
+      <section class="chart-section">
+        <h2>Performance Over Time</h2>
+        <div class="chart-container">
+          <canvas id="mainChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Simple Footer -->
+      <footer class="footer">
+        <p>
+          Updated {{ timestamp }} •
+          <a href="https://github.com/aavetis/ai-pr-watcher">GitHub</a>
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      // Simple chart initialization
+      let chart = null;
+
+      document.addEventListener("DOMContentLoaded", function () {
+        loadChart();
+      });
+
+      async function loadChart() {
+        try {
+          const response = await fetch("chart-data.json");
+          const data = await response.json();
+          initChart(data);
+        } catch (error) {
+          console.error("Chart failed to load:", error);
+        }
+      }
+
+      function initChart(data) {
+        const ctx = document.getElementById("mainChart").getContext("2d");
+
+        chart = new Chart(ctx, {
+          type: "line",
+          data: data,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "top",
+                labels: {
+                  color: "#94a3b8",
+                  font: { family: "Inter", size: 12 },
+                  padding: 20,
+                  usePointStyle: true,
+                },
+              },
+            },
+            scales: {
+              x: {
+                type: "time",
+                time: { unit: "day" },
+                grid: { color: "#334155" },
+                ticks: { color: "#94a3b8" },
+              },
+              y: {
+                grid: { color: "#334155" },
+                ticks: { color: "#94a3b8" },
+              },
+            },
+          },
+        });
+      }
+    </script>
+  </body>
+</html>

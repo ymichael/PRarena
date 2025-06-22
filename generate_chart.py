@@ -68,14 +68,22 @@ AGENTS = [
 ]
 
 
-def build_stats(latest):
+def build_stats(latest, df=None):
     stats = {}
+
+    # Get real data for each agent
     for agent in AGENTS:
         key = agent["key"]
         total = int(latest[f"{key}_total"])
         merged = int(latest[f"{key}_merged"])
         rate = (merged / total * 100) if total > 0 else 0
-        stats[key] = {"total": total, "merged": merged, "rate": rate}
+
+        # Simple, meaningful stats only
+        stats[key] = {
+            "total": total,
+            "merged": merged,
+            "rate": rate,
+        }
     return stats
 
 
@@ -100,14 +108,16 @@ def generate_chart(csv_file=None):
     if len(df) == 0:
         print("Error: No data found in CSV file.")
         return False
-        
+
     # Limit to 8 data points spread across the entire dataset to avoid chart getting too busy
     total_points = len(df)
     if total_points > 8:
         # Create evenly spaced indices across the entire dataset
         indices = np.linspace(0, total_points - 1, num=8, dtype=int)
         df = df.iloc[indices]
-        print(f"Limited chart to 8 data points evenly distributed across {total_points} total points.")
+        print(
+            f"Limited chart to 8 data points evenly distributed across {total_points} total points."
+        )
 
     # Calculate percentages with safety checks
     df["copilot_percentage"] = df.apply(
@@ -171,7 +181,7 @@ def generate_chart(csv_file=None):
 
     # Bar charts for totals and merged
     bars_copilot_total = ax1.bar(
-        x - 2*width,
+        x - 2 * width,
         df["copilot_total"],
         width,
         label="Copilot Total",
@@ -179,7 +189,7 @@ def generate_chart(csv_file=None):
         color="#87CEEB",
     )
     bars_copilot_merged = ax1.bar(
-        x - 2*width,
+        x - 2 * width,
         df["copilot_merged"],
         width,
         label="Copilot Merged",
@@ -188,7 +198,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_codex_total = ax1.bar(
-        x - 1*width,
+        x - 1 * width,
         df["codex_total"],
         width,
         label="Codex Total",
@@ -196,7 +206,7 @@ def generate_chart(csv_file=None):
         color="#FFA07A",
     )
     bars_codex_merged = ax1.bar(
-        x - 1*width,
+        x - 1 * width,
         df["codex_merged"],
         width,
         label="Codex Merged",
@@ -205,7 +215,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_cursor_total = ax1.bar(
-        x + 0*width,
+        x + 0 * width,
         df["cursor_total"],
         width,
         label="Cursor Total",
@@ -213,7 +223,7 @@ def generate_chart(csv_file=None):
         color="#DDA0DD",
     )
     bars_cursor_merged = ax1.bar(
-        x + 0*width,
+        x + 0 * width,
         df["cursor_merged"],
         width,
         label="Cursor Merged",
@@ -222,7 +232,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_devin_total = ax1.bar(
-        x + 1*width,
+        x + 1 * width,
         df["devin_total"],
         width,
         label="Devin Total",
@@ -230,7 +240,7 @@ def generate_chart(csv_file=None):
         color="#98FB98",
     )
     bars_devin_merged = ax1.bar(
-        x + 1*width,
+        x + 1 * width,
         df["devin_merged"],
         width,
         label="Devin Merged",
@@ -239,7 +249,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_codegen_total = ax1.bar(
-        x + 2*width,
+        x + 2 * width,
         df["codegen_total"],
         width,
         label="Codegen Total",
@@ -247,7 +257,7 @@ def generate_chart(csv_file=None):
         color="#FFE4B5",
     )
     bars_codegen_merged = ax1.bar(
-        x + 2*width,
+        x + 2 * width,
         df["codegen_merged"],
         width,
         label="Codegen Merged",
@@ -386,10 +396,22 @@ def generate_chart(csv_file=None):
 
     # Add percentage labels on line points (with validation and skip 0.0%)
     for i, (cop_pct, cod_pct, cur_pct, dev_pct, cg_pct) in enumerate(
-        zip(df["copilot_percentage"], df["codex_percentage"], df["cursor_percentage"], df["devin_percentage"], df["codegen_percentage"])
+        zip(
+            df["copilot_percentage"],
+            df["codex_percentage"],
+            df["cursor_percentage"],
+            df["devin_percentage"],
+            df["codegen_percentage"],
+        )
     ):
         # Only add labels if percentages are valid numbers and not 0.0%
-        if pd.notna(cop_pct) and pd.notna(cod_pct) and pd.notna(cur_pct) and pd.notna(dev_pct) and pd.notna(cg_pct):
+        if (
+            pd.notna(cop_pct)
+            and pd.notna(cod_pct)
+            and pd.notna(cur_pct)
+            and pd.notna(dev_pct)
+            and pd.notna(cg_pct)
+        ):
             if cop_pct > 0.0:
                 ax2.annotate(
                     f"{cop_pct:.1f}%",
@@ -447,7 +469,7 @@ def generate_chart(csv_file=None):
                 )
 
     plt.tight_layout(pad=6.0)
-    
+
     # Adjust subplot parameters to ensure legends fit entirely outside the chart
     plt.subplots_adjust(left=0.2, right=0.85, top=0.85, bottom=0.2)
 
@@ -464,7 +486,7 @@ def generate_chart(csv_file=None):
 
     # Update the README with latest statistics
     update_readme(df)
-    
+
     # Update the GitHub Pages with latest statistics
     update_github_pages(df)
 
@@ -475,94 +497,97 @@ def export_chart_data_json(df):
     """Export chart data as JSON for interactive JavaScript chart"""
     docs_dir = Path("docs")
     docs_dir.mkdir(exist_ok=True)
-    
+
     # Prepare data for Chart.js
-    chart_data = {
-        "labels": [],
-        "datasets": []
-    }
-    
+    chart_data = {"labels": [], "datasets": []}
+
     # Format timestamps for labels
     for _, row in df.iterrows():
         timestamp = row["timestamp"]
         if isinstance(timestamp, str):
             timestamp = pd.to_datetime(timestamp)
         chart_data["labels"].append(timestamp.strftime("%m/%d %H:%M"))
-    
+
     # Color scheme matching the Python chart
     colors = {
         "copilot": {"total": "#87CEEB", "merged": "#4682B4", "line": "#000080"},
         "codex": {"total": "#FFA07A", "merged": "#CD5C5C", "line": "#8B0000"},
         "cursor": {"total": "#DDA0DD", "merged": "#9370DB", "line": "#800080"},
         "devin": {"total": "#98FB98", "merged": "#228B22", "line": "#006400"},
-        "codegen": {"total": "#FFE4B5", "merged": "#DAA520", "line": "#B8860B"}
+        "codegen": {"total": "#FFE4B5", "merged": "#DAA520", "line": "#B8860B"},
     }
-    
+
     # Add bar datasets for totals and merged PRs
     for agent in ["copilot", "codex", "cursor", "devin", "codegen"]:
         # Process data to replace leading zeros with None (null in JSON)
         total_data = df[f"{agent}_total"].tolist()
         merged_data = df[f"{agent}_merged"].tolist()
         percentage_data = df[f"{agent}_percentage"].tolist()
-        
+
         # Find first non-zero total value index
         first_nonzero_idx = None
         for i, total in enumerate(total_data):
             if total > 0:
                 first_nonzero_idx = i
                 break
-        
+
         # Replace leading zeros with None
         if first_nonzero_idx is not None:
             for i in range(first_nonzero_idx):
                 total_data[i] = None
                 merged_data[i] = None
                 percentage_data[i] = None
-        
+
         # Total PRs
-        chart_data["datasets"].append({
-            "label": f"{agent.title()} Total",
-            "type": "bar",
-            "data": total_data,
-            "backgroundColor": colors[agent]["total"],
-            "borderColor": colors[agent]["total"],
-            "borderWidth": 1,
-            "yAxisID": "y",
-            "order": 2
-        })
-        
+        chart_data["datasets"].append(
+            {
+                "label": f"{agent.title()} Total",
+                "type": "bar",
+                "data": total_data,
+                "backgroundColor": colors[agent]["total"],
+                "borderColor": colors[agent]["total"],
+                "borderWidth": 1,
+                "yAxisID": "y",
+                "order": 2,
+            }
+        )
+
         # Merged PRs
-        chart_data["datasets"].append({
-            "label": f"{agent.title()} Merged",
-            "type": "bar",
-            "data": merged_data,
-            "backgroundColor": colors[agent]["merged"],
-            "borderColor": colors[agent]["merged"],
-            "borderWidth": 1,
-            "yAxisID": "y",
-            "order": 2
-        })
-        
+        chart_data["datasets"].append(
+            {
+                "label": f"{agent.title()} Merged",
+                "type": "bar",
+                "data": merged_data,
+                "backgroundColor": colors[agent]["merged"],
+                "borderColor": colors[agent]["merged"],
+                "borderWidth": 1,
+                "yAxisID": "y",
+                "order": 2,
+            }
+        )
+
         # Success rate line
-        chart_data["datasets"].append({
-            "label": f"{agent.title()} Success %",
-            "type": "line",
-            "data": percentage_data,
-            "borderColor": colors[agent]["line"],
-            "backgroundColor": "rgba(255, 255, 255, 0.8)",
-            "borderWidth": 3,
-            "pointRadius": 3,
-            "pointHoverRadius": 5,
-            "fill": False,
-            "yAxisID": "y1",
-            "order": 1
-        })
-    
+        chart_data["datasets"].append(
+            {
+                "label": f"{agent.title()} Success %",
+                "type": "line",
+                "data": percentage_data,
+                "borderColor": colors[agent]["line"],
+                "backgroundColor": "rgba(255, 255, 255, 0.8)",
+                "borderWidth": 3,
+                "pointRadius": 3,
+                "pointHoverRadius": 5,
+                "fill": False,
+                "yAxisID": "y1",
+                "order": 1,
+            }
+        )
+
     # Write JSON file
     json_file = docs_dir / "chart-data.json"
     with open(json_file, "w") as f:
         json.dump(chart_data, f, indent=2)
-    
+
     print(f"Chart data exported: {json_file}")
     return True
 
@@ -590,13 +615,17 @@ def update_github_pages(df):
     if not index_path.exists():
         print(f"Warning: {index_path} not found, skipping GitHub Pages update.")
         return False
+
     latest = df.iloc[-1]
     stats = build_stats(latest)
     timestamp = dt.datetime.now().strftime("%B %d, %Y %H:%M UTC")
+
+    # Simple context - just the essentials
     context = {"agents": AGENTS, "stats": stats, "timestamp": timestamp}
+
     content = env.get_template("index_template.html").render(context)
     index_path.write_text(content)
-    print("GitHub Pages updated with latest statistics.")
+    print("GitHub Pages updated with latest statistics and enhanced analytics.")
     return True
 
 

@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Coding Agents</title>
+    <link rel="stylesheet" href="styles.css" />
+    <meta http-equiv="refresh" content="3600" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <header class="hero">
+        <h1>AI Coding Agents</h1>
+        <p>Which AI writes the most successful code?</p>
+      </header>
+      <!-- Simple Leaderboard -->
+      <section class="leaderboard">
+{% for agent in agents %}
+        <div class="agent" data-success-rate="{{ stats[agent.key].rate }}">
+          <div class="agent-header">
+            <div class="rank">#{{ loop.index }}</div>
+            <div class="agent-dot" style="background-color: {{ agent.color }}"></div>
+            <div class="agent-info">
+              <h3><a href="{{ agent.info_url }}" target="_blank">{{ agent.long_name }}</a></h3>
+              <span class="agent-subtitle">{{ stats[agent.key].total | comma }} PRs</span>
+            </div>
+          </div>
+          <div class="metrics">
+            <div class="primary-metric">
+              <span class="metric-value">{{ stats[agent.key].rate | round(1) }}%</span>
+              <span class="metric-label">Success Rate</span>
+            </div>
+            <div class="secondary-metrics">
+              <div class="metric">
+                <a href="{{ agent.merged_query_url }}" target="_blank">{{ stats[agent.key].merged | comma }}</a>
+                <span>merged</span>
+              </div>
+            </div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: {{ stats[agent.key].rate }}%; background-color: {{ agent.color }}"></div>
+          </div>
+        </div>
+{% endfor %}
+      </section>
+
+      <!-- Simple Chart -->
+      <section class="chart-section">
+        <h2>Performance Over Time</h2>
+        <div class="chart-container">
+          <canvas id="mainChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Simple Footer -->
+      <footer class="footer">
+        <p>Updated {{ timestamp }} • <a href="https://github.com/aavetis/ai-pr-watcher">GitHub</a></p>
+      </footer>
+    </div>
+
+    <script>
+      // Simple chart initialization
+      let chart = null;
+
+      document.addEventListener('DOMContentLoaded', function() {
+        loadChart();
+      });
+
+      async function loadChart() {
+        try {
+          const response = await fetch("chart-data.json");
+          const data = await response.json();
+          initChart(data);
+        } catch (error) {
+          console.error("Chart failed to load:", error);
+        }
+      }
+
+      function initChart(data) {
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        
+        chart = new Chart(ctx, {
+          type: 'line',
+          data: data,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  color: '#94a3b8',
+                  font: { family: 'Inter', size: 12 },
+                  padding: 20,
+                  usePointStyle: true
+                }
+              }
+            },
+            scales: {
+              x: {
+                type: 'time',
+                time: { unit: 'day' },
+                grid: { color: '#334155' },
+                ticks: { color: '#94a3b8' }
+              },
+              y: {
+                grid: { color: '#334155' },
+                ticks: { color: '#94a3b8' }
+              }
+            }
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
+      <section class="analytics-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fas fa-chart-line"></i>
+            Advanced Analytics
+          </h2>
+          <div class="time-range-selector">
+            <button class="time-btn active" data-range="7d">7D</button>
+            <button class="time-btn" data-range="30d">30D</button>
+            <button class="time-btn" data-range="90d">90D</button>
+            <button class="time-btn" data-range="all">ALL</button>
+          </div>
+        </div>
+
+        <div class="analytics-grid">
+          <!-- Performance Overview Chart -->
+          <div class="chart-container large">
+            <div class="chart-header">
+              <h3>Performance Timeline</h3>
+              <div class="chart-controls">
+                <button class="chart-toggle active" data-metric="volume">Volume</button>
+                <button class="chart-toggle" data-metric="success-rate">Success Rate</button>
+                <button class="chart-toggle" data-metric="velocity">Velocity</button>
+              </div>
+            </div>
+            <canvas id="performanceChart"></canvas>
+          </div>
+
+          <!-- Activity Heatmap -->
+          <div class="chart-container medium">
+            <div class="chart-header">
+              <h3>Activity Heatmap</h3>
+              <p class="chart-subtitle">PR creation patterns by day & hour</p>
+            </div>
+            <div id="activityHeatmap" class="heatmap-container"></div>
+          </div>
+
+          <!-- Language Distribution -->
+          <div class="chart-container medium">
+            <div class="chart-header">
+              <h3>Language Distribution</h3>
+              <p class="chart-subtitle">Most popular programming languages</p>
+            </div>
+            <canvas id="languageChart"></canvas>
+          </div>
+
+          <!-- Competition Analysis -->
+          <div class="chart-container large">
+            <div class="chart-header">
+              <h3>Head-to-Head Competition</h3>
+              <div class="comparison-selectors">
+                <select id="agent1Select" class="agent-selector">
+                  <option value="copilot">GitHub Copilot</option>
+                  <option value="codex">OpenAI Codex</option>
+                  <option value="cursor">Cursor Agents</option>
+                  <option value="devin">Devin</option>
+                  <option value="codegen">Codegen</option>
+                </select>
+                <span class="vs-indicator">VS</span>
+                <select id="agent2Select" class="agent-selector">
+                  <option value="codex">OpenAI Codex</option>
+                  <option value="copilot">GitHub Copilot</option>
+                  <option value="cursor">Cursor Agents</option>
+                  <option value="devin">Devin</option>
+                  <option value="codegen">Codegen</option>
+                </select>
+              </div>
+            </div>
+            <canvas id="comparisonChart"></canvas>
+          </div>
+
+          <!-- Global Insights -->
+          <div class="insights-container">
+            <div class="insight-card">
+              <div class="insight-icon">
+                <i class="fas fa-fire"></i>
+              </div>
+              <div class="insight-content">
+                <h4>Hottest Agent</h4>
+                <p>{{ hottest_agent.name }} with {{ hottest_agent.daily_prs }} PRs today</p>
+              </div>
+            </div>
+
+            <div class="insight-card">
+              <div class="insight-icon">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <div class="insight-content">
+                <h4>Quality Champion</h4>
+                <p>{{ quality_champion.name }} leads with {{ quality_champion.rate }}% success rate</p>
+              </div>
+            </div>
+
+            <div class="insight-card">
+              <div class="insight-icon">
+                <i class="fas fa-rocket"></i>
+              </div>
+              <div class="insight-content">
+                <h4>Speed Demon</h4>
+                <p>{{ speed_demon.name }} averages {{ speed_demon.merge_time }} merge time</p>
+              </div>
+            </div>
+
+            <div class="insight-card">
+              <div class="insight-icon">
+                <i class="fas fa-globe"></i>
+              </div>
+              <div class="insight-content">
+                <h4>Most Diverse</h4>
+                <p>{{ most_diverse.name }} contributes to {{ most_diverse.repo_count }} repositories</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Activity Feed -->
+      <section class="activity-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fas fa-rss"></i>
+            Live Activity Feed
+          </h2>
+          <div class="activity-controls">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="merged">Merged</button>
+            <button class="filter-btn" data-filter="created">Created</button>
+          </div>
+        </div>
+
+        <div class="activity-feed" id="activityFeed">
+          <!-- Activity items will be populated by JavaScript -->
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-content">
+          <div class="footer-left">
+            <p class="footer-title">AI Coding Agents Arena</p>
+            <p class="footer-subtitle">Tracking the future of automated development</p>
+          </div>
+          <div class="footer-center">
+            <div class="footer-stat">
+              <span class="footer-stat-label">Last Updated</span>
+              <span class="footer-stat-value" id="last-updated">{{ timestamp }}</span>
+            </div>
+            <div class="footer-stat">
+              <span class="footer-stat-label">Data Source</span>
+              <span class="footer-stat-value">GitHub Public API</span>
+            </div>
+          </div>
+          <div class="footer-right">
+            <a href="https://github.com/aavetis/ai-pr-watcher" class="footer-link">
+              <i class="fab fa-github"></i>
+              View on GitHub
+            </a>
+            <div class="footer-social">
+              <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Agent Detail Modal -->
+    <div id="agentModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalAgentName">Agent Details</h2>
+          <span class="modal-close" onclick="closeAgentModal()">&times;</span>
+        </div>
+        <div class="modal-body" id="modalBody">
+          <!-- Content populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global variables
+      let chartInstances = {};
+      let chartData = null;
+      let currentTheme = localStorage.getItem('theme') || 'dark';
+
+      // Initialize the application
+      document.addEventListener('DOMContentLoaded', function() {
+        initializeTheme();
+        loadChartData();
+        initializeEventListeners();
+        startLiveUpdates();
+      });
+
+      // Theme Management
+      function initializeTheme() {
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeIcon();
+      }
+
+      function toggleTheme() {
+        currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        localStorage.setItem('theme', currentTheme);
+        updateThemeIcon();
+
+        // Recreate charts with new theme
+        Object.values(chartInstances).forEach(chart => chart.destroy());
+        chartInstances = {};
+        loadChartData();
+      }
+
+      function updateThemeIcon() {
+        const icon = document.querySelector('.theme-toggle i');
+        icon.className = currentTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+      }
+
+      // Chart Data Loading
+      async function loadChartData() {
+        try {
+          const response = await fetch("chart-data.json");
+          chartData = await response.json();
+          initializeCharts();
+        } catch (error) {
+          console.error("Failed to load chart data:", error);
+          showFallback();
+        }
+      }
+
+      function showFallback() {
+        // Show static chart fallback if needed
+        console.log("Showing chart fallback");
+      }
+
+      // Chart Initialization
+      function initializeCharts() {
+        initializePerformanceChart();
+        initializeLanguageChart();
+        initializeComparisonChart();
+        initializeActivityHeatmap();
+      }
+
+      function initializePerformanceChart() {
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+
+        const isDark = currentTheme === 'dark';
+        const textColor = isDark ? '#e2e8f0' : '#374151';
+        const gridColor = isDark ? '#374151' : '#e5e7eb';
+
+        chartInstances.performance = new Chart(ctx, {
+          type: 'line',
+          data: chartData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              intersect: false,
+              mode: 'index'
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  color: textColor,
+                  usePointStyle: true,
+                  padding: 20
+                }
+              },
+              tooltip: {
+                backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                titleColor: textColor,
+                bodyColor: textColor,
+                borderColor: gridColor,
+                borderWidth: 1
+              }
+            },
+            scales: {
+              x: {
+                type: 'time',
+                time: {
+                  unit: 'day'
+                },
+                grid: {
+                  color: gridColor
+                },
+                ticks: {
+                  color: textColor
+                }
+              },
+              y: {
+                grid: {
+                  color: gridColor
+                },
+                ticks: {
+                  color: textColor
+                }
+              }
+            }
+          }
+        });
+      }
+
+      function initializeLanguageChart() {
+        const ctx = document.getElementById('languageChart').getContext('2d');
+
+        // Mock data for language distribution
+        const languageData = {
+          labels: ['JavaScript', 'Python', 'TypeScript', 'Java', 'Go', 'Rust', 'C++'],
+          datasets: [{
+            data: [35, 25, 15, 10, 8, 4, 3],
+            backgroundColor: [
+              '#f1c40f', '#3498db', '#2980b9', '#e74c3c',
+              '#00b4d8', '#e85d04', '#9b2226'
+            ],
+            borderWidth: 0
+          }]
+        };
+
+        chartInstances.language = new Chart(ctx, {
+          type: 'doughnut',
+          data: languageData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: {
+                  color: currentTheme === 'dark' ? '#e2e8f0' : '#374151',
+                  padding: 15
+                }
+              }
+            }
+          }
+        });
+      }
+
+      function initializeComparisonChart() {
+        const ctx = document.getElementById('comparisonChart').getContext('2d');
+
+        // This will be populated based on agent selection
+        chartInstances.comparison = new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: ['Total PRs', 'Success Rate', 'Velocity', 'Diversity', 'Quality'],
+            datasets: []
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                beginAtZero: true,
+                grid: {
+                  color: currentTheme === 'dark' ? '#374151' : '#e5e7eb'
+                },
+                pointLabels: {
+                  color: currentTheme === 'dark' ? '#e2e8f0' : '#374151'
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                labels: {
+                  color: currentTheme === 'dark' ? '#e2e8f0' : '#374151'
+                }
+              }
+            }
+          }
+        });
+      }
+
+      function initializeActivityHeatmap() {
+        // Create a simple heatmap using HTML/CSS
+        const container = document.getElementById('activityHeatmap');
+        container.innerHTML = generateHeatmapHTML();
+      }
+
+      function generateHeatmapHTML() {
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const hours = Array.from({length: 24}, (_, i) => i);
+
+        let html = '<div class="heatmap-grid">';
+
+        // Generate mock activity data
+        days.forEach(day => {
+          html += `<div class="heatmap-row">`;
+          html += `<div class="day-label">${day}</div>`;
+          hours.forEach(hour => {
+            const intensity = Math.random();
+            const intensityClass = intensity > 0.7 ? 'high' : intensity > 0.4 ? 'medium' : intensity > 0.1 ? 'low' : 'none';
+            html += `<div class="heatmap-cell ${intensityClass}" title="${day} ${hour}:00 - Activity: ${Math.round(intensity * 100)}%"></div>`;
+          });
+          html += `</div>`;
+        });
+
+        html += '</div>';
+        return html;
+      }
+
+      // Event Listeners
+      function initializeEventListeners() {
+        // Sort buttons
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            sortAgents(e.target.dataset.sort);
+          });
+        });
+
+        // Time range selector
+        document.querySelectorAll('.time-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            updateChartsForTimeRange(e.target.dataset.range);
+          });
+        });
+
+        // Chart metric toggles
+        document.querySelectorAll('.chart-toggle').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.chart-toggle').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            updatePerformanceChart(e.target.dataset.metric);
+          });
+        });
+
+        // Agent comparison selectors
+        document.getElementById('agent1Select').addEventListener('change', updateComparisonChart);
+        document.getElementById('agent2Select').addEventListener('change', updateComparisonChart);
+
+        // Activity feed filters
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            filterActivityFeed(e.target.dataset.filter);
+          });
+        });
+      }
+
+      // Utility Functions
+      function sortAgents(criteria) {
+        // Implementation for sorting agent cards
+        console.log(`Sorting by: ${criteria}`);
+      }
+
+      function updateChartsForTimeRange(range) {
+        // Implementation for updating charts based on time range
+        console.log(`Updating charts for: ${range}`);
+      }
+
+      function updatePerformanceChart(metric) {
+        // Implementation for switching performance chart metrics
+        console.log(`Switching to metric: ${metric}`);
+      }
+
+      function updateComparisonChart() {
+        const agent1 = document.getElementById('agent1Select').value;
+        const agent2 = document.getElementById('agent2Select').value;
+        console.log(`Comparing ${agent1} vs ${agent2}`);
+      }
+
+      function filterActivityFeed(filter) {
+        // Implementation for filtering activity feed
+        console.log(`Filtering by: ${filter}`);
+      }
+
+      function showAgentDetails(agentKey) {
+        // Show modal with detailed agent information
+        const modal = document.getElementById('agentModal');
+        modal.style.display = 'block';
+
+        // Populate modal content
+        document.getElementById('modalAgentName').textContent = `${agentKey} Details`;
+        document.getElementById('modalBody').innerHTML = generateAgentDetailsHTML(agentKey);
+      }
+
+      function closeAgentModal() {
+        document.getElementById('agentModal').style.display = 'none';
+      }
+
+      function generateAgentDetailsHTML(agentKey) {
+        return `
+          <div class="agent-details">
+            <p>Detailed analytics for ${agentKey} will be displayed here.</p>
+            <div class="detail-charts">
+              <!-- Additional charts and metrics -->
+            </div>
+          </div>
+        `;
+      }
+
+      function startLiveUpdates() {
+        // Simulate live updates every 30 seconds
+        setInterval(() => {
+          updateLiveIndicator();
+          // Add new activity items
+          addActivityItem();
+        }, 30000);
+      }
+
+      function updateLiveIndicator() {
+        const indicator = document.querySelector('.pulse-dot');
+        indicator.style.animation = 'none';
+        setTimeout(() => {
+          indicator.style.animation = 'pulse 2s infinite';
+        }, 10);
+      }
+
+      function addActivityItem() {
+        const feed = document.getElementById('activityFeed');
+        const agents = ['GitHub Copilot', 'OpenAI Codex', 'Cursor Agents', 'Devin', 'Codegen'];
+        const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+        const actions = ['created', 'merged', 'updated'];
+        const randomAction = actions[Math.floor(Math.random() * actions.length)];
+
+        const activityItem = document.createElement('div');
+        activityItem.className = 'activity-item';
+        activityItem.innerHTML = `
+          <div class="activity-icon ${randomAction}">
+            <i class="fas fa-${randomAction === 'created' ? 'plus' : randomAction === 'merged' ? 'check' : 'edit'}"></i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-text">
+              <strong>${randomAgent}</strong> ${randomAction} a pull request
+            </div>
+            <div class="activity-time">Just now</div>
+          </div>
+        `;
+
+        feed.insertBefore(activityItem, feed.firstChild);
+
+        // Keep only last 10 items
+        while (feed.children.length > 10) {
+          feed.removeChild(feed.lastChild);
+        }
+      }
+
+      // Initialize activity feed with some items
+      document.addEventListener('DOMContentLoaded', function() {
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => addActivityItem(), i * 1000);
+        }
+      });
+
+      // Modal click outside to close
+      window.onclick = function(event) {
+        const modal = document.getElementById('agentModal');
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      }
+    </script>
+  </body>
+</html>
+              mode: "point",
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: "PR Volume vs Success Rate",
+                font: {
+                  size: 16,
+                  weight: "bold",
+                },
+              },
+              legend: {
+                display: true,
+                position: "right",
+                labels: {
+                  usePointStyle: true,
+                  pointStyle: "circle",
+                  font: {
+                    size: 11,
+                  },
+                },
+              },
+              tooltip: {
+                callbacks: {
+                  title: function (context) {
+                    return context[0].label;
+                  },
+                  label: function (context) {
+                    const datasetLabel = context.dataset.label;
+                    const value = context.parsed.y;
+
+                    if (datasetLabel.includes("Success %")) {
+                      return datasetLabel + ": " + value.toFixed(1) + "%";
+                    } else {
+                      return (
+                        datasetLabel + ": " + value.toLocaleString() + " PRs"
+                      );
+                    }
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: "Time",
+                },
+              },
+              y: {
+                type: "linear",
+                display: true,
+                position: "left",
+                title: {
+                  display: true,
+                  text: "Number of PRs",
+                },
+                beginAtZero: true,
+              },
+              y1: {
+                type: "linear",
+                display: true,
+                position: "right",
+                title: {
+                  display: true,
+                  text: "Success Rate (%)",
+                },
+                beginAtZero: true,
+                max: 100,
+                grid: {
+                  drawOnChartArea: false,
+                },
+              },
+            },
+          },
+        });
+
+        // Hide fallback and show interactive chart
+        document.querySelector(".chart-fallback").style.display = "none";
+        document.querySelector(".chart-container").style.display = "block";
+        document.querySelector(".chart-controls").style.display = "block";
+
+        // Update statistics table with latest data
+        updateStatisticsTable();
+
+        // Set up toggle functionality
+        setupToggleButtons();
+      }
+
+      function updateStatisticsTable() {
+        if (!chartData || !chartData.datasets) return;
+
+        // Get the latest data point (last index)
+        const latestIndex = chartData.labels.length - 1;
+
+        // Dynamically generated from server-side AGENTS list
+        const agents = {{ agents | tojson | safe }};
+
+        agents.forEach((agent) => {
+          // Find datasets for this agent
+          const totalDataset = chartData.datasets.find(
+            (d) =>
+              d.label.toLowerCase().includes(agent.key) &&
+              d.label.toLowerCase().includes("total")
+          );
+          const mergedDataset = chartData.datasets.find(
+            (d) =>
+              d.label.toLowerCase().includes(agent.key) &&
+              d.label.toLowerCase().includes("merged")
+          );
+
+          if (totalDataset && mergedDataset) {
+            const total = totalDataset.data[latestIndex] || 0;
+            const merged = mergedDataset.data[latestIndex] || 0;
+            const rate = total > 0 ? (merged / total) * 100 : 0;
+
+            // Update table cells
+            const totalElement = document.getElementById(`${agent}-total`);
+            const mergedElement = document.getElementById(`${agent}-merged`);
+            const rateElement = document.getElementById(`${agent}-rate`);
+
+            if (totalElement) totalElement.textContent = total.toLocaleString();
+            if (mergedElement)
+              mergedElement.textContent = merged.toLocaleString();
+            if (rateElement) rateElement.textContent = rate.toFixed(1) + "%";
+          }
+        });
+      }
+
+      function setupToggleButtons() {
+        const toggleButtons = document.querySelectorAll(".toggle-btn");
+        const viewButtons = document.querySelectorAll(".view-btn");
+
+        // Agent toggle functionality
+        toggleButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const agent = this.dataset.agent;
+            const isActive = this.classList.contains("active");
+
+            // Toggle button state
+            this.classList.toggle("active");
+
+            // Get current view mode
+            const activeViewBtn = document.querySelector(".view-btn.active");
+            const currentView = activeViewBtn
+              ? activeViewBtn.dataset.view
+              : "all";
+
+            // Find and toggle datasets for this agent
+            chartInstance.data.datasets.forEach((dataset, index) => {
+              const labelLower = dataset.label.toLowerCase();
+              if (labelLower.includes(agent)) {
+                const isLine = dataset.type === "line";
+                const isBar = dataset.type === "bar";
+
+                if (isActive) {
+                  // Was active, now hiding
+                  dataset.hidden = true;
+                } else {
+                  // Was hidden, now showing (but respect view mode)
+                  switch (currentView) {
+                    case "all":
+                      dataset.hidden = false;
+                      break;
+                    case "bars":
+                      dataset.hidden = isLine;
+                      break;
+                    case "lines":
+                      dataset.hidden = isBar;
+                      break;
+                  }
+                }
+              }
+            });
+
+            chartInstance.update();
+          });
+        });
+
+        // View mode functionality
+        viewButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const view = this.dataset.view;
+
+            // Update button states
+            viewButtons.forEach((btn) => btn.classList.remove("active"));
+            this.classList.add("active");
+
+            // Show/hide datasets based on view mode and agent toggles
+            chartInstance.data.datasets.forEach((dataset) => {
+              const isLine = dataset.type === "line";
+              const isBar = dataset.type === "bar";
+
+              // Get the agent name from the dataset label
+              const agentMatch = dataset.label
+                .toLowerCase()
+                .match(/(copilot|codex|cursor|devin|codegen)/);
+              const agent = agentMatch ? agentMatch[1] : null;
+
+              // Check if agent is currently enabled
+              const agentButton = document.querySelector(
+                `.toggle-btn[data-agent="${agent}"]`
+              );
+              const agentEnabled =
+                agentButton && agentButton.classList.contains("active");
+
+              switch (view) {
+                case "all":
+                  dataset.hidden = !agentEnabled;
+                  break;
+                case "bars":
+                  dataset.hidden = !agentEnabled || isLine;
+                  break;
+                case "lines":
+                  dataset.hidden = !agentEnabled || isBar;
+                  break;
+              }
+            });
+
+            chartInstance.update();
+          });
+        });
+      }
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        loadChartData();
+
+        // Update last updated timestamp
+        const now = new Date();
+        const formattedDate = now.toLocaleString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "UTC",
+          timeZoneName: "short",
+        });
+        document.getElementById("last-updated").textContent = formattedDate;
+      });
+    </script>
+  </body>
+</html>
