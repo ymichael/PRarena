@@ -12,6 +12,71 @@ import numpy as np
 import datetime as dt
 import re
 import json
+from jinja2 import Environment, FileSystemLoader
+
+
+TEMPLATE_DIR = Path("templates")
+env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
+env.filters["comma"] = lambda v: f"{int(v):,}" if isinstance(v, (int, float)) else v
+
+AGENTS = [
+    {
+        "key": "copilot",
+        "display": "Copilot",
+        "long_name": "GitHub Copilot",
+        "color": "#87ceeb",
+        "info_url": "https://docs.github.com/en/copilot/using-github-copilot/coding-agent/using-copilot-to-work-on-an-issue",
+        "total_query_url": "https://github.com/search?q=is:pr+head:copilot/&type=pullrequests",
+        "merged_query_url": "https://github.com/search?q=is:pr+head:copilot/+is:merged&type=pullrequests",
+    },
+    {
+        "key": "codex",
+        "display": "Codex",
+        "long_name": "OpenAI Codex",
+        "color": "#ff6b6b",
+        "info_url": "https://openai.com/index/introducing-codex/",
+        "total_query_url": "https://github.com/search?q=is:pr+head:codex/&type=pullrequests",
+        "merged_query_url": "https://github.com/search?q=is:pr+head:codex/+is:merged&type=pullrequests",
+    },
+    {
+        "key": "cursor",
+        "display": "Cursor",
+        "long_name": "Cursor Agents",
+        "color": "#9b59b6",
+        "info_url": "https://docs.cursor.com/background-agent",
+        "total_query_url": "https://github.com/search?q=is:pr+head:cursor/&type=pullrequests",
+        "merged_query_url": "https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests",
+    },
+    {
+        "key": "devin",
+        "display": "Devin",
+        "long_name": "Devin",
+        "color": "#52c41a",
+        "info_url": "https://devin.ai/pricing",
+        "total_query_url": "https://github.com/search?q=author:devin-ai-integration[bot]&type=pullrequests",
+        "merged_query_url": "https://github.com/search?q=author:devin-ai-integration[bot]+is:merged&type=pullrequests",
+    },
+    {
+        "key": "codegen",
+        "display": "Codegen",
+        "long_name": "Codegen",
+        "color": "#daa520",
+        "info_url": "https://codegen.com/",
+        "total_query_url": "https://github.com/search?q=author:codegen-sh[bot]&type=pullrequests",
+        "merged_query_url": "https://github.com/search?q=author:codegen-sh[bot]+is:merged&type=pullrequests",
+    },
+]
+
+
+def build_stats(latest):
+    stats = {}
+    for agent in AGENTS:
+        key = agent["key"]
+        total = int(latest[f"{key}_total"])
+        merged = int(latest[f"{key}_merged"])
+        rate = (merged / total * 100) if total > 0 else 0
+        stats[key] = {"total": total, "merged": merged, "rate": rate}
+    return stats
 
 
 def generate_chart(csv_file=None):
@@ -503,141 +568,35 @@ def export_chart_data_json(df):
 
 
 def update_readme(df):
-    """Update the README.md with the latest statistics"""
+    """Render README.md from template with latest statistics"""
     readme_path = Path("README.md")
-
-    # Skip if README doesn't exist
     if not readme_path.exists():
         print(f"Warning: {readme_path} not found, skipping README update.")
         return False
 
-    # Get the latest data
     latest = df.iloc[-1]
+    stats = build_stats(latest)
 
-    # Calculate merge rates
-    copilot_rate = latest.copilot_merged / latest.copilot_total * 100
-    codex_rate = latest.codex_merged / latest.codex_total * 100
-    cursor_rate = latest.cursor_merged / latest.cursor_total * 100 if latest.cursor_total > 0 else 0
-    devin_rate = latest.devin_merged / latest.devin_total * 100 if latest.devin_total > 0 else 0
-    codegen_rate = latest.codegen_merged / latest.codegen_total * 100 if latest.codegen_total > 0 else 0
-
-    # Format numbers with commas
-    copilot_total = f"{latest.copilot_total:,}"
-    copilot_merged = f"{latest.copilot_merged:,}"
-    codex_total = f"{latest.codex_total:,}"
-    codex_merged = f"{latest.codex_merged:,}"
-    cursor_total = f"{latest.cursor_total:,}"
-    cursor_merged = f"{latest.cursor_merged:,}"
-    devin_total = f"{latest.devin_total:,}"
-    devin_merged = f"{latest.devin_merged:,}"
-    codegen_total = f"{latest.codegen_total:,}"
-    codegen_merged = f"{latest.codegen_merged:,}"
-
-    # Create the new table content
-    table_content = f"""## Current Statistics
-
-| Project | Total PRs | Merged PRs | Merge Rate |
-| ------- | --------- | ---------- | ---------- |
-| Copilot | {copilot_total} | {copilot_merged} | {copilot_rate:.2f}% |
-| Codex   | {codex_total} | {codex_merged} | {codex_rate:.2f}% |
-| Cursor  | {cursor_total} | {cursor_merged} | {cursor_rate:.2f}% |
-| Devin   | {devin_total} | {devin_merged} | {devin_rate:.2f}% |
-| Codegen | {codegen_total} | {codegen_merged} | {codegen_rate:.2f}% |"""
-
-    # Read the current README content
-    readme_content = readme_path.read_text()
-
-    # Split content at the statistics header (if it exists)
-    if "## Current Statistics" in readme_content:
-        base_content = readme_content.split("## Current Statistics")[0].rstrip()
-        new_content = f"{base_content}\n\n{table_content}"
-    else:
-        new_content = f"{readme_content}\n\n{table_content}"
-
-    # Write the updated content back
-    readme_path.write_text(new_content)
-    print(f"README.md updated with latest statistics.")
+    context = {"agents": AGENTS, "stats": stats}
+    content = env.get_template("readme_template.md").render(context)
+    readme_path.write_text(content)
+    print("README.md updated with latest statistics.")
     return True
 
 
 def update_github_pages(df):
-    """Update the GitHub Pages website with the latest statistics"""
+    """Render the GitHub Pages site from template with latest statistics"""
     index_path = Path("docs/index.html")
-    
-    # Skip if index.html doesn't exist
     if not index_path.exists():
         print(f"Warning: {index_path} not found, skipping GitHub Pages update.")
         return False
-    
-    # Get the latest data
     latest = df.iloc[-1]
-    
-    # Calculate merge rates
-    copilot_rate = latest.copilot_merged / latest.copilot_total * 100
-    codex_rate = latest.codex_merged / latest.codex_total * 100
-    cursor_rate = latest.cursor_merged / latest.cursor_total * 100 if latest.cursor_total > 0 else 0
-    devin_rate = latest.devin_merged / latest.devin_total * 100 if latest.devin_total > 0 else 0
-    codegen_rate = latest.codegen_merged / latest.codegen_total * 100 if latest.codegen_total > 0 else 0
-
-    # Format numbers with commas
-    copilot_total = f"{latest.copilot_total:,}"
-    copilot_merged = f"{latest.copilot_merged:,}"
-    codex_total = f"{latest.codex_total:,}"
-    codex_merged = f"{latest.codex_merged:,}"
-    cursor_total = f"{latest.cursor_total:,}"
-    cursor_merged = f"{latest.cursor_merged:,}"
-    devin_total = f"{latest.devin_total:,}"
-    devin_merged = f"{latest.devin_merged:,}"
-    codegen_total = f"{latest.codegen_total:,}"
-    codegen_merged = f"{latest.codegen_merged:,}"
-    
-    # Current timestamp for last updated
+    stats = build_stats(latest)
     timestamp = dt.datetime.now().strftime("%B %d, %Y %H:%M UTC")
-    
-    # Read the current index.html content
-    index_content = index_path.read_text()
-    
-    # Update the table data
-    index_content = re.sub(
-        r'<td>Copilot</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
-        f'<td>Copilot</td>\n                        <td>{copilot_total}</td>\n                        <td>{copilot_merged}</td>\n                        <td>{copilot_rate:.2f}%</td>',
-        index_content
-    )
-    
-    index_content = re.sub(
-        r'<td>Codex</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
-        f'<td>Codex</td>\n                        <td>{codex_total}</td>\n                        <td>{codex_merged}</td>\n                        <td>{codex_rate:.2f}%</td>',
-        index_content
-    )
-    
-    index_content = re.sub(
-        r'<td>Cursor</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
-        f'<td>Cursor</td>\n                        <td>{cursor_total}</td>\n                        <td>{cursor_merged}</td>\n                        <td>{cursor_rate:.2f}%</td>',
-        index_content
-    )
-    
-    index_content = re.sub(
-        r'<td>Devin</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
-        f'<td>Devin</td>\n                        <td>{devin_total}</td>\n                        <td>{devin_merged}</td>\n                        <td>{devin_rate:.2f}%</td>',
-        index_content
-    )
-    
-    index_content = re.sub(
-        r'<td>Codegen</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
-        f'<td>Codegen</td>\n                        <td>{codegen_total}</td>\n                        <td>{codegen_merged}</td>\n                        <td>{codegen_rate:.2f}%</td>',
-        index_content
-    )
-    
-    # Update the last updated timestamp
-    index_content = re.sub(
-        r'<span id="last-updated">[^<]*</span>',
-        f'<span id="last-updated">{timestamp}</span>',
-        index_content
-    )
-    
-    # Write the updated content back
-    index_path.write_text(index_content)
-    print(f"GitHub Pages updated with latest statistics.")
+    context = {"agents": AGENTS, "stats": stats, "timestamp": timestamp}
+    content = env.get_template("index_template.html").render(context)
+    index_path.write_text(content)
+    print("GitHub Pages updated with latest statistics.")
     return True
 
 
