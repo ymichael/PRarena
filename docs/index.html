@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Coding Agents</title>
+    <title>PR Arena - AI Coding Agent Leaderboard</title>
     <link rel="stylesheet" href="styles.css" />
     <meta http-equiv="refresh" content="3600" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
@@ -11,15 +11,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
     <div class="container">
       <header class="hero">
-        <h1>AI Coding Agents</h1>
-        <p>Which AI writes the most successful code?</p>
+        <h1>PR Arena</h1>
+        <p>Software engineering agents head to head</p>
       </header>
 
       <!-- Dynamic Leaderboard -->
@@ -36,35 +36,35 @@
         <div class="agents-container" id="agentsContainer">
 
           <div class="agent"
-               data-success-rate="58.29907068431428"
-               data-total-prs="17755"
-               data-merged-prs="10351"
+               data-success-rate="58.429290106204576"
+               data-total-prs="17890"
+               data-merged-prs="10453"
                data-agent-name="GitHub Copilot">
             <div class="agent-header">
               <div class="rank" data-rank="1">#1</div>
-              <div class="agent-dot" style="background-color: #87ceeb"></div>
+              <div class="agent-dot" style="background-color: #2563eb"></div>
               <div class="agent-info">
                 <h3><a href="https://docs.github.com/en/copilot/using-github-copilot/coding-agent/using-copilot-to-work-on-an-issue" target="_blank">GitHub Copilot</a></h3>
-                <span class="agent-subtitle">17,755 PRs</span>
+                <span class="agent-subtitle">17,890 PRs</span>
               </div>
             </div>
             <div class="metrics">
               <div class="primary-metric">
                 <span class="metric-value">
-                  58.3%
+                  58.4%
                 </span>
                 <span class="metric-label">Success Rate</span>
               </div>
               <div class="secondary-metrics">
                 <div class="metric">
                   <a href="https://github.com/search?q=is:pr+head:copilot/&type=pullrequests" target="_blank"
-                    >17,755</a
+                    >17,890</a
                   >
                   <span>total PRs</span>
                 </div>
                 <div class="metric">
                   <a href="https://github.com/search?q=is:pr+head:copilot/+is:merged&type=pullrequests" target="_blank"
-                    >10,351</a
+                    >10,453</a
                   >
                   <span>merged</span>
                 </div>
@@ -73,41 +73,41 @@
           <div class="progress-bar">
             <div
               class="progress"
-              style="width: 58.29907068431428%; background-color: #87ceeb"
+              style="width: 58.429290106204576%; background-color: #2563eb"
             ></div>
           </div>
         </div>
         
           <div class="agent"
-               data-success-rate="85.73180547365966"
-               data-total-prs="446027"
-               data-merged-prs="382387"
+               data-success-rate="85.77278281065968"
+               data-total-prs="454235"
+               data-merged-prs="389610"
                data-agent-name="OpenAI Codex">
             <div class="agent-header">
               <div class="rank" data-rank="2">#2</div>
-              <div class="agent-dot" style="background-color: #ff6b6b"></div>
+              <div class="agent-dot" style="background-color: #dc2626"></div>
               <div class="agent-info">
                 <h3><a href="https://openai.com/index/introducing-codex/" target="_blank">OpenAI Codex</a></h3>
-                <span class="agent-subtitle">446,027 PRs</span>
+                <span class="agent-subtitle">454,235 PRs</span>
               </div>
             </div>
             <div class="metrics">
               <div class="primary-metric">
                 <span class="metric-value">
-                  85.7%
+                  85.8%
                 </span>
                 <span class="metric-label">Success Rate</span>
               </div>
               <div class="secondary-metrics">
                 <div class="metric">
                   <a href="https://github.com/search?q=is:pr+head:codex/&type=pullrequests" target="_blank"
-                    >446,027</a
+                    >454,235</a
                   >
                   <span>total PRs</span>
                 </div>
                 <div class="metric">
                   <a href="https://github.com/search?q=is:pr+head:codex/+is:merged&type=pullrequests" target="_blank"
-                    >382,387</a
+                    >389,610</a
                   >
                   <span>merged</span>
                 </div>
@@ -116,41 +116,41 @@
           <div class="progress-bar">
             <div
               class="progress"
-              style="width: 85.73180547365966%; background-color: #ff6b6b"
+              style="width: 85.77278281065968%; background-color: #dc2626"
             ></div>
           </div>
         </div>
         
           <div class="agent"
-               data-success-rate="73.83224510296333"
-               data-total-prs="1991"
-               data-merged-prs="1470"
+               data-success-rate="73.85652383245065"
+               data-total-prs="2077"
+               data-merged-prs="1534"
                data-agent-name="Cursor Agents">
             <div class="agent-header">
               <div class="rank" data-rank="3">#3</div>
-              <div class="agent-dot" style="background-color: #9b59b6"></div>
+              <div class="agent-dot" style="background-color: #7c3aed"></div>
               <div class="agent-info">
                 <h3><a href="https://docs.cursor.com/background-agent" target="_blank">Cursor Agents</a></h3>
-                <span class="agent-subtitle">1,991 PRs</span>
+                <span class="agent-subtitle">2,077 PRs</span>
               </div>
             </div>
             <div class="metrics">
               <div class="primary-metric">
                 <span class="metric-value">
-                  73.8%
+                  73.9%
                 </span>
                 <span class="metric-label">Success Rate</span>
               </div>
               <div class="secondary-metrics">
                 <div class="metric">
                   <a href="https://github.com/search?q=is:pr+head:cursor/&type=pullrequests" target="_blank"
-                    >1,991</a
+                    >2,077</a
                   >
                   <span>total PRs</span>
                 </div>
                 <div class="metric">
                   <a href="https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests" target="_blank"
-                    >1,470</a
+                    >1,534</a
                   >
                   <span>merged</span>
                 </div>
@@ -159,41 +159,41 @@
           <div class="progress-bar">
             <div
               class="progress"
-              style="width: 73.83224510296333%; background-color: #9b59b6"
+              style="width: 73.85652383245065%; background-color: #7c3aed"
             ></div>
           </div>
         </div>
         
           <div class="agent"
-               data-success-rate="61.0930536474215"
-               data-total-prs="29843"
-               data-merged-prs="18232"
+               data-success-rate="60.999866059469596"
+               data-total-prs="29864"
+               data-merged-prs="18217"
                data-agent-name="Devin">
             <div class="agent-header">
               <div class="rank" data-rank="4">#4</div>
-              <div class="agent-dot" style="background-color: #52c41a"></div>
+              <div class="agent-dot" style="background-color: #059669"></div>
               <div class="agent-info">
                 <h3><a href="https://devin.ai/pricing" target="_blank">Devin</a></h3>
-                <span class="agent-subtitle">29,843 PRs</span>
+                <span class="agent-subtitle">29,864 PRs</span>
               </div>
             </div>
             <div class="metrics">
               <div class="primary-metric">
                 <span class="metric-value">
-                  61.1%
+                  61.0%
                 </span>
                 <span class="metric-label">Success Rate</span>
               </div>
               <div class="secondary-metrics">
                 <div class="metric">
                   <a href="https://github.com/search?q=author:devin-ai-integration[bot]&type=pullrequests" target="_blank"
-                    >29,843</a
+                    >29,864</a
                   >
                   <span>total PRs</span>
                 </div>
                 <div class="metric">
                   <a href="https://github.com/search?q=author:devin-ai-integration[bot]+is:merged&type=pullrequests" target="_blank"
-                    >18,232</a
+                    >18,217</a
                   >
                   <span>merged</span>
                 </div>
@@ -202,41 +202,41 @@
           <div class="progress-bar">
             <div
               class="progress"
-              style="width: 61.0930536474215%; background-color: #52c41a"
+              style="width: 60.999866059469596%; background-color: #059669"
             ></div>
           </div>
         </div>
         
           <div class="agent"
-               data-success-rate="39.911417322834644"
-               data-total-prs="4064"
-               data-merged-prs="1622"
+               data-success-rate="40.47041707080504"
+               data-total-prs="4124"
+               data-merged-prs="1669"
                data-agent-name="Codegen">
             <div class="agent-header">
               <div class="rank" data-rank="5">#5</div>
-              <div class="agent-dot" style="background-color: #daa520"></div>
+              <div class="agent-dot" style="background-color: #d97706"></div>
               <div class="agent-info">
                 <h3><a href="https://codegen.com/" target="_blank">Codegen</a></h3>
-                <span class="agent-subtitle">4,064 PRs</span>
+                <span class="agent-subtitle">4,124 PRs</span>
               </div>
             </div>
             <div class="metrics">
               <div class="primary-metric">
                 <span class="metric-value">
-                  39.9%
+                  40.5%
                 </span>
                 <span class="metric-label">Success Rate</span>
               </div>
               <div class="secondary-metrics">
                 <div class="metric">
                   <a href="https://github.com/search?q=author:codegen-sh[bot]&type=pullrequests" target="_blank"
-                    >4,064</a
+                    >4,124</a
                   >
                   <span>total PRs</span>
                 </div>
                 <div class="metric">
                   <a href="https://github.com/search?q=author:codegen-sh[bot]+is:merged&type=pullrequests" target="_blank"
-                    >1,622</a
+                    >1,669</a
                   >
                   <span>merged</span>
                 </div>
@@ -245,44 +245,117 @@
           <div class="progress-bar">
             <div
               class="progress"
-              style="width: 39.911417322834644%; background-color: #daa520"
+              style="width: 40.47041707080504%; background-color: #d97706"
             ></div>
           </div>
         </div>
         
       </section>
 
-      <!-- Dual Charts -->
-      <section class="charts-section">
-        <div class="charts-container">
-          <div class="chart-half">
-            <h3>Volume Over Time</h3>
-            <div class="chart-container">
-              <canvas id="volumeChart"></canvas>
+      <!-- Historic Chart -->
+      <section class="chart">
+        <h2>PR Volume vs. Success Rate</h2>
+        <div class="chart-controls">
+          <div class="control-row">
+            <div class="control-section">
+              <span class="control-label">AGENTS</span>
+              <div class="toggle-buttons">
+                
+                <button
+                  id="toggleCopilot"
+                  class="toggle-btn active"
+                  data-agent="copilot"
+                >
+                  <span
+                    class="toggle-icon"
+                    style="background-color: #2563eb"
+                  ></span
+                  >GitHub Copilot
+                </button>
+                
+                <button
+                  id="toggleCodex"
+                  class="toggle-btn active"
+                  data-agent="codex"
+                >
+                  <span
+                    class="toggle-icon"
+                    style="background-color: #dc2626"
+                  ></span
+                  >OpenAI Codex
+                </button>
+                
+                <button
+                  id="toggleCursor"
+                  class="toggle-btn active"
+                  data-agent="cursor"
+                >
+                  <span
+                    class="toggle-icon"
+                    style="background-color: #7c3aed"
+                  ></span
+                  >Cursor Agents
+                </button>
+                
+                <button
+                  id="toggleDevin"
+                  class="toggle-btn active"
+                  data-agent="devin"
+                >
+                  <span
+                    class="toggle-icon"
+                    style="background-color: #059669"
+                  ></span
+                  >Devin
+                </button>
+                
+                <button
+                  id="toggleCodegen"
+                  class="toggle-btn active"
+                  data-agent="codegen"
+                >
+                  <span
+                    class="toggle-icon"
+                    style="background-color: #d97706"
+                  ></span
+                  >Codegen
+                </button>
+                
+              </div>
+            </div>
+            <div class="control-section">
+              <span class="control-label">VIEW MODE</span>
+              <div class="toggle-buttons">
+                <button id="viewAll" class="view-btn active" data-view="all">
+                  <span class="view-icon">●</span>Complete View
+                </button>
+                <button id="viewBarsOnly" class="view-btn" data-view="bars">
+                  Volume Only
+                </button>
+                <button id="viewLinesOnly" class="view-btn" data-view="lines">
+                  Success Rate Only
+                </button>
+              </div>
             </div>
           </div>
-          <div class="chart-half">
-            <h3>Success Rate Over Time</h3>
-            <div class="chart-container">
-              <canvas id="successChart"></canvas>
-            </div>
-          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="prChart" width="800" height="400"></canvas>
         </div>
       </section>
 
       <!-- Simple Footer -->
       <footer class="footer">
         <p>
-          Updated June 22, 2025 15:45 UTC •
-          <a href="https://github.com/aavetis/ai-pr-watcher">GitHub</a>
+          Updated June 23, 2025 09:48 UTC •
+          <a href="https://github.com/aavetis/ai-pr-watcher">by aavetis</a>
         </p>
       </footer>
     </div>
 
     <script>
-      // Chart instances
-      let volumeChart = null;
-      let successChart = null;
+      // Chart instance
+      let chartInstance = null;
 
       document.addEventListener("DOMContentLoaded", function () {
         initializeSorting();
@@ -362,120 +435,248 @@
           const data = await response.json();
           console.log("Chart data loaded:", data);
 
-          initVolumeChart(data);
-          initSuccessChart(data);
+          initializeChart(data);
         } catch (error) {
           console.error("Charts failed to load:", error);
-          // Show error message in charts
-          document.getElementById("volumeChart").parentElement.innerHTML =
-            '<p style="color: #ef4444; text-align: center; padding: 2rem;">Failed to load volume chart</p>';
-          document.getElementById("successChart").parentElement.innerHTML =
-            '<p style="color: #ef4444; text-align: center; padding: 2rem;">Failed to load success chart</p>';
+          // Show error message in chart
+          document.querySelector(".chart-container").innerHTML =
+            '<p style="color: #ef4444; text-align: center; padding: 2rem;">Failed to load chart</p>';
         }
       }
 
-      function initVolumeChart(data) {
-        console.log("Initializing volume chart...");
-        const ctx = document.getElementById("volumeChart").getContext("2d");
+      function initializeChart(chartData) {
+        console.log("Initializing combined chart...");
+        const ctx = document.getElementById("prChart").getContext("2d");
 
-        // Filter data to show only total/merged datasets (bars)
-        const volumeData = {
-          labels: data.labels,
-          datasets: data.datasets.filter(
-            (dataset) =>
-              dataset.type === "bar" &&
-              (dataset.label.includes("Total") ||
-                dataset.label.includes("Merged"))
-          ),
-        };
-
-        console.log("Volume chart data:", volumeData);
-
-        volumeChart = new Chart(ctx, {
+        chartInstance = new Chart(ctx, {
           type: "bar",
-          data: volumeData,
+          data: chartData,
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+              intersect: false,
+              mode: "point",
+            },
             plugins: {
+              title: {
+                display: false,
+              },
               legend: {
-                position: "top",
+                display: true,
+                position: "right",
                 labels: {
-                  color: "#94a3b8",
-                  font: { family: "Inter", size: 11 },
-                  padding: 15,
                   usePointStyle: true,
+                  pointStyle: "circle",
+                  color: "#64748b",
+                  font: {
+                    family: "IBM Plex Mono",
+                    size: 11,
+                    weight: "500",
+                  },
+                  padding: 15,
+                  boxWidth: 12,
                 },
               },
-            },
-            scales: {
-              x: {
-                grid: { color: "#334155" },
-                ticks: { color: "#94a3b8", font: { size: 10 } },
-              },
-              y: {
-                grid: { color: "#334155" },
-                ticks: { color: "#94a3b8", font: { size: 10 } },
-              },
-            },
-          },
-        });
-        console.log("Volume chart initialized");
-      }
+              tooltip: {
+                titleColor: "#1f2937",
+                bodyColor: "#374151",
+                backgroundColor: "rgba(255, 255, 255, 0.95)",
+                borderColor: "#e5e7eb",
+                borderWidth: 1,
+                callbacks: {
+                  title: function (context) {
+                    return context[0].label;
+                  },
+                  label: function (context) {
+                    const datasetLabel = context.dataset.label;
+                    const value = context.parsed.y;
 
-      function initSuccessChart(data) {
-        console.log("Initializing success chart...");
-        const ctx = document.getElementById("successChart").getContext("2d");
-
-        // Filter data to show only success rate datasets (lines)
-        const successData = {
-          labels: data.labels,
-          datasets: data.datasets.filter(
-            (dataset) =>
-              dataset.type === "line" && dataset.label.includes("Success")
-          ),
-        };
-
-        console.log("Success chart data:", successData);
-
-        successChart = new Chart(ctx, {
-          type: "line",
-          data: successData,
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                position: "top",
-                labels: {
-                  color: "#94a3b8",
-                  font: { family: "Inter", size: 11 },
-                  padding: 15,
-                  usePointStyle: true,
-                },
-              },
-            },
-            scales: {
-              x: {
-                grid: { color: "#334155" },
-                ticks: { color: "#94a3b8", font: { size: 10 } },
-              },
-              y: {
-                min: 0,
-                max: 100,
-                grid: { color: "#334155" },
-                ticks: {
-                  color: "#94a3b8",
-                  font: { size: 10 },
-                  callback: function (value) {
-                    return value + "%";
+                    if (datasetLabel.includes("Success %")) {
+                      return datasetLabel + ": " + value.toFixed(1) + "%";
+                    } else {
+                      return (
+                        datasetLabel + ": " + value.toLocaleString() + " PRs"
+                      );
+                    }
                   },
                 },
               },
             },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: "Time",
+                  color: "#475569",
+                  font: {
+                    family: "IBM Plex Mono",
+                    size: 12,
+                    weight: "500",
+                  },
+                },
+                grid: { color: "#f1f5f9", lineWidth: 1 },
+                ticks: {
+                  color: "#475569",
+                  font: { family: "IBM Plex Mono", size: 11 },
+                  maxRotation: 45,
+                  minRotation: 0
+                },
+              },
+              y: {
+                type: "linear",
+                display: true,
+                position: "left",
+                title: {
+                  display: true,
+                  text: "Number of PRs",
+                  color: "#475569",
+                  font: {
+                    family: "IBM Plex Mono",
+                    size: 12,
+                    weight: "500",
+                  },
+                },
+                grid: { color: "#f1f5f9", lineWidth: 1 },
+                ticks: {
+                  color: "#475569",
+                  font: { family: "IBM Plex Mono", size: 11 },
+                  callback: function(value) {
+                    return value.toLocaleString();
+                  }
+                },
+                beginAtZero: true,
+              },
+              y1: {
+                type: "linear",
+                display: true,
+                position: "right",
+                title: {
+                  display: true,
+                  text: "Success Rate (%)",
+                  color: "#475569",
+                  font: {
+                    family: "IBM Plex Mono",
+                    size: 12,
+                    weight: "500",
+                  },
+                },
+                ticks: {
+                  color: "#475569",
+                  font: { family: "IBM Plex Mono", size: 11 },
+                  callback: function (value) {
+                    return value + "%";
+                  },
+                },
+                beginAtZero: true,
+                max: 100,
+                grid: {
+                  drawOnChartArea: false,
+                },
+              },
+            },
           },
         });
-        console.log("Success chart initialized");
+
+        console.log("Chart initialized");
+
+        // Set up toggle functionality
+        setupToggleButtons();
+      }
+
+      function setupToggleButtons() {
+        const toggleButtons = document.querySelectorAll(".toggle-btn");
+        const viewButtons = document.querySelectorAll(".view-btn");
+
+        // Agent toggle functionality
+        toggleButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const agent = this.dataset.agent;
+            const isActive = this.classList.contains("active");
+
+            // Toggle button state
+            this.classList.toggle("active");
+
+            // Get current view mode
+            const activeViewBtn = document.querySelector(".view-btn.active");
+            const currentView = activeViewBtn
+              ? activeViewBtn.dataset.view
+              : "all";
+
+            // Find and toggle datasets for this agent
+            chartInstance.data.datasets.forEach((dataset, index) => {
+              const labelLower = dataset.label.toLowerCase();
+              if (labelLower.includes(agent)) {
+                const isLine = dataset.type === "line";
+                const isBar = dataset.type === "bar";
+
+                if (isActive) {
+                  // Was active, now hiding
+                  dataset.hidden = true;
+                } else {
+                  // Was hidden, now showing (but respect view mode)
+                  switch (currentView) {
+                    case "all":
+                      dataset.hidden = false;
+                      break;
+                    case "bars":
+                      dataset.hidden = isLine;
+                      break;
+                    case "lines":
+                      dataset.hidden = isBar;
+                      break;
+                  }
+                }
+              }
+            });
+
+            chartInstance.update();
+          });
+        });
+
+        // View mode functionality
+        viewButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const view = this.dataset.view;
+
+            // Update button states
+            viewButtons.forEach((btn) => btn.classList.remove("active"));
+            this.classList.add("active");
+
+            // Show/hide datasets based on view mode and agent toggles
+            chartInstance.data.datasets.forEach((dataset) => {
+              const isLine = dataset.type === "line";
+              const isBar = dataset.type === "bar";
+
+              // Get the agent name from the dataset label
+              const agentMatch = dataset.label
+                .toLowerCase()
+                .match(/(copilot|codex|cursor|devin|codegen)/);
+              const agent = agentMatch ? agentMatch[1] : null;
+
+              // Check if agent is currently enabled
+              const agentButton = document.querySelector(
+                `.toggle-btn[data-agent="${agent}"]`
+              );
+              const agentEnabled =
+                agentButton && agentButton.classList.contains("active");
+
+              switch (view) {
+                case "all":
+                  dataset.hidden = !agentEnabled;
+                  break;
+                case "bars":
+                  dataset.hidden = !agentEnabled || isLine;
+                  break;
+                case "lines":
+                  dataset.hidden = !agentEnabled || isBar;
+                  break;
+              }
+            });
+
+            chartInstance.update();
+          });
+        });
       }
     </script>
   </body>
