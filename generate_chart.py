@@ -24,7 +24,7 @@ AGENTS = [
         "key": "copilot",
         "display": "Copilot",
         "long_name": "GitHub Copilot",
-        "color": "#87ceeb",
+        "color": "#2563eb",
         "info_url": "https://docs.github.com/en/copilot/using-github-copilot/coding-agent/using-copilot-to-work-on-an-issue",
         "total_query_url": "https://github.com/search?q=is:pr+head:copilot/&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+head:copilot/+is:merged&type=pullrequests",
@@ -33,7 +33,7 @@ AGENTS = [
         "key": "codex",
         "display": "Codex",
         "long_name": "OpenAI Codex",
-        "color": "#ff6b6b",
+        "color": "#dc2626",
         "info_url": "https://openai.com/index/introducing-codex/",
         "total_query_url": "https://github.com/search?q=is:pr+head:codex/&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+head:codex/+is:merged&type=pullrequests",
@@ -42,7 +42,7 @@ AGENTS = [
         "key": "cursor",
         "display": "Cursor",
         "long_name": "Cursor Agents",
-        "color": "#9b59b6",
+        "color": "#7c3aed",
         "info_url": "https://docs.cursor.com/background-agent",
         "total_query_url": "https://github.com/search?q=is:pr+head:cursor/&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests",
@@ -51,7 +51,7 @@ AGENTS = [
         "key": "devin",
         "display": "Devin",
         "long_name": "Devin",
-        "color": "#52c41a",
+        "color": "#059669",
         "info_url": "https://devin.ai/pricing",
         "total_query_url": "https://github.com/search?q=author:devin-ai-integration[bot]&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=author:devin-ai-integration[bot]+is:merged&type=pullrequests",
@@ -60,7 +60,7 @@ AGENTS = [
         "key": "codegen",
         "display": "Codegen",
         "long_name": "Codegen",
-        "color": "#daa520",
+        "color": "#d97706",
         "info_url": "https://codegen.com/",
         "total_query_url": "https://github.com/search?q=author:codegen-sh[bot]&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=author:codegen-sh[bot]+is:merged&type=pullrequests",
@@ -186,7 +186,7 @@ def generate_chart(csv_file=None):
         width,
         label="Copilot Total",
         alpha=0.7,
-        color="#87CEEB",
+        color="#93c5fd",
     )
     bars_copilot_merged = ax1.bar(
         x - 2 * width,
@@ -194,7 +194,7 @@ def generate_chart(csv_file=None):
         width,
         label="Copilot Merged",
         alpha=1.0,
-        color="#4682B4",
+        color="#2563eb",
     )
 
     bars_codex_total = ax1.bar(
@@ -203,7 +203,7 @@ def generate_chart(csv_file=None):
         width,
         label="Codex Total",
         alpha=0.7,
-        color="#FFA07A",
+        color="#fca5a5",
     )
     bars_codex_merged = ax1.bar(
         x - 1 * width,
@@ -211,7 +211,7 @@ def generate_chart(csv_file=None):
         width,
         label="Codex Merged",
         alpha=1.0,
-        color="#CD5C5C",
+        color="#dc2626",
     )
 
     bars_cursor_total = ax1.bar(
@@ -220,7 +220,7 @@ def generate_chart(csv_file=None):
         width,
         label="Cursor Total",
         alpha=0.7,
-        color="#DDA0DD",
+        color="#c4b5fd",
     )
     bars_cursor_merged = ax1.bar(
         x + 0 * width,
@@ -228,7 +228,7 @@ def generate_chart(csv_file=None):
         width,
         label="Cursor Merged",
         alpha=1.0,
-        color="#9370DB",
+        color="#7c3aed",
     )
 
     bars_devin_total = ax1.bar(
@@ -237,7 +237,7 @@ def generate_chart(csv_file=None):
         width,
         label="Devin Total",
         alpha=0.7,
-        color="#98FB98",
+        color="#86efac",
     )
     bars_devin_merged = ax1.bar(
         x + 1 * width,
@@ -245,7 +245,7 @@ def generate_chart(csv_file=None):
         width,
         label="Devin Merged",
         alpha=1.0,
-        color="#228B22",
+        color="#059669",
     )
 
     bars_codegen_total = ax1.bar(
@@ -254,7 +254,7 @@ def generate_chart(csv_file=None):
         width,
         label="Codegen Total",
         alpha=0.7,
-        color="#FFE4B5",
+        color="#fed7aa",
     )
     bars_codegen_merged = ax1.bar(
         x + 2 * width,
@@ -262,7 +262,7 @@ def generate_chart(csv_file=None):
         width,
         label="Codegen Merged",
         alpha=1.0,
-        color="#DAA520",
+        color="#d97706",
     )
 
     # Line charts for percentages (on secondary y-axis)
@@ -270,65 +270,65 @@ def generate_chart(csv_file=None):
         x,
         df["copilot_percentage"],
         "o-",
-        color="#000080",
+        color="#1d4ed8",
         linewidth=3,
         markersize=10,
         label="Copilot Success %",
         markerfacecolor="white",
         markeredgewidth=2,
-        markeredgecolor="#000080",
+        markeredgecolor="#1d4ed8",
     )
 
     line_codex = ax2.plot(
         x,
         df["codex_percentage"],
         "s-",
-        color="#8B0000",
+        color="#b91c1c",
         linewidth=3,
         markersize=10,
         label="Codex Success %",
         markerfacecolor="white",
         markeredgewidth=2,
-        markeredgecolor="#8B0000",
+        markeredgecolor="#b91c1c",
     )
 
     line_cursor = ax2.plot(
         x,
         df["cursor_percentage"],
         "d-",
-        color="#800080",
+        color="#6d28d9",
         linewidth=3,
         markersize=10,
         label="Cursor Success %",
         markerfacecolor="white",
         markeredgewidth=2,
-        markeredgecolor="#800080",
+        markeredgecolor="#6d28d9",
     )
 
     line_devin = ax2.plot(
         x,
         df["devin_percentage"],
         "^-",
-        color="#006400",
+        color="#047857",
         linewidth=3,
         markersize=10,
         label="Devin Success %",
         markerfacecolor="white",
         markeredgewidth=2,
-        markeredgecolor="#006400",
+        markeredgecolor="#047857",
     )
 
     line_codegen = ax2.plot(
         x,
         df["codegen_percentage"],
         "v-",
-        color="#B8860B",
+        color="#b45309",
         linewidth=3,
         markersize=10,
         label="Codegen Success %",
         markerfacecolor="white",
         markeredgewidth=2,
-        markeredgecolor="#B8860B",
+        markeredgecolor="#b45309",
     )
 
     # Customize the chart
@@ -421,7 +421,7 @@ def generate_chart(csv_file=None):
                     ha="center",
                     fontsize=10,
                     fontweight="bold",
-                    color="#000080",
+                    color="#1d4ed8",
                 )
             if cod_pct > 0.0:
                 ax2.annotate(
@@ -432,7 +432,7 @@ def generate_chart(csv_file=None):
                     ha="center",
                     fontsize=10,
                     fontweight="bold",
-                    color="#8B0000",
+                    color="#b91c1c",
                 )
             if cur_pct > 0.0:
                 ax2.annotate(
@@ -443,7 +443,7 @@ def generate_chart(csv_file=None):
                     ha="center",
                     fontsize=10,
                     fontweight="bold",
-                    color="#800080",
+                    color="#6d28d9",
                 )
             if dev_pct > 0.0:
                 ax2.annotate(
@@ -454,7 +454,7 @@ def generate_chart(csv_file=None):
                     ha="center",
                     fontsize=10,
                     fontweight="bold",
-                    color="#006400",
+                    color="#047857",
                 )
             if cg_pct > 0.0:
                 ax2.annotate(
@@ -465,7 +465,7 @@ def generate_chart(csv_file=None):
                     ha="center",
                     fontsize=10,
                     fontweight="bold",
-                    color="#B8860B",
+                    color="#b45309",
                 )
 
     plt.tight_layout(pad=6.0)
@@ -508,13 +508,13 @@ def export_chart_data_json(df):
             timestamp = pd.to_datetime(timestamp)
         chart_data["labels"].append(timestamp.strftime("%m/%d %H:%M"))
 
-    # Color scheme matching the Python chart
+    # Color scheme matching the Python chart - elegant professional colors
     colors = {
-        "copilot": {"total": "#87CEEB", "merged": "#4682B4", "line": "#000080"},
-        "codex": {"total": "#FFA07A", "merged": "#CD5C5C", "line": "#8B0000"},
-        "cursor": {"total": "#DDA0DD", "merged": "#9370DB", "line": "#800080"},
-        "devin": {"total": "#98FB98", "merged": "#228B22", "line": "#006400"},
-        "codegen": {"total": "#FFE4B5", "merged": "#DAA520", "line": "#B8860B"},
+        "copilot": {"total": "#93c5fd", "merged": "#2563eb", "line": "#1d4ed8"},
+        "codex": {"total": "#fca5a5", "merged": "#dc2626", "line": "#b91c1c"},
+        "cursor": {"total": "#c4b5fd", "merged": "#7c3aed", "line": "#6d28d9"},
+        "devin": {"total": "#86efac", "merged": "#059669", "line": "#047857"},
+        "codegen": {"total": "#fed7aa", "merged": "#d97706", "line": "#b45309"},
     }
 
     # Add bar datasets for totals and merged PRs

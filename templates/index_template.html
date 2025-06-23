@@ -80,21 +80,47 @@
         {% endfor %}
       </section>
 
-      <!-- Dual Charts -->
-      <section class="charts-section">
-        <div class="charts-container">
-          <div class="chart-half">
-            <h3>Volume Over Time</h3>
-            <div class="chart-container">
-              <canvas id="volumeChart"></canvas>
+      <!-- Historic Chart -->
+      <section class="chart">
+        <h2>Historic Chart</h2>
+        <div class="chart-controls">
+          <div class="control-row">
+            <div class="control-section">
+              <span class="control-label">AGENTS</span>
+              <div class="toggle-buttons">
+                {% for agent in agents %}
+                <button
+                  id="toggle{{ agent.key|title }}"
+                  class="toggle-btn active"
+                  data-agent="{{ agent.key }}"
+                >
+                  <span
+                    class="toggle-icon"
+                    style="background-color: {{ agent.color }}"
+                  ></span
+                  >{{ agent.long_name }}
+                </button>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="control-section">
+              <span class="control-label">VIEW MODE</span>
+              <div class="toggle-buttons">
+                <button id="viewAll" class="view-btn active" data-view="all">
+                  <span class="view-icon">●</span>Complete View
+                </button>
+                <button id="viewBarsOnly" class="view-btn" data-view="bars">
+                  Volume Only
+                </button>
+                <button id="viewLinesOnly" class="view-btn" data-view="lines">
+                  Success Rate Only
+                </button>
+              </div>
             </div>
           </div>
-          <div class="chart-half">
-            <h3>Success Rate Over Time</h3>
-            <div class="chart-container">
-              <canvas id="successChart"></canvas>
-            </div>
-          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="prChart" width="800" height="400"></canvas>
         </div>
       </section>
 
@@ -108,9 +134,8 @@
     </div>
 
     <script>
-      // Chart instances
-      let volumeChart = null;
-      let successChart = null;
+      // Chart instance
+      let chartInstance = null;
 
       document.addEventListener("DOMContentLoaded", function () {
         initializeSorting();
@@ -190,120 +215,256 @@
           const data = await response.json();
           console.log("Chart data loaded:", data);
 
-          initVolumeChart(data);
-          initSuccessChart(data);
+          initializeChart(data);
         } catch (error) {
           console.error("Charts failed to load:", error);
-          // Show error message in charts
-          document.getElementById("volumeChart").parentElement.innerHTML =
-            '<p style="color: #ef4444; text-align: center; padding: 2rem;">Failed to load volume chart</p>';
-          document.getElementById("successChart").parentElement.innerHTML =
-            '<p style="color: #ef4444; text-align: center; padding: 2rem;">Failed to load success chart</p>';
+          // Show error message in chart
+          document.querySelector(".chart-container").innerHTML =
+            '<p style="color: #ef4444; text-align: center; padding: 2rem;">Failed to load chart</p>';
         }
       }
 
-      function initVolumeChart(data) {
-        console.log("Initializing volume chart...");
-        const ctx = document.getElementById("volumeChart").getContext("2d");
+      function initializeChart(chartData) {
+        console.log("Initializing combined chart...");
+        const ctx = document.getElementById("prChart").getContext("2d");
 
-        // Filter data to show only total/merged datasets (bars)
-        const volumeData = {
-          labels: data.labels,
-          datasets: data.datasets.filter(
-            (dataset) =>
-              dataset.type === "bar" &&
-              (dataset.label.includes("Total") ||
-                dataset.label.includes("Merged"))
-          ),
-        };
-
-        console.log("Volume chart data:", volumeData);
-
-        volumeChart = new Chart(ctx, {
+        chartInstance = new Chart(ctx, {
           type: "bar",
-          data: volumeData,
+          data: chartData,
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+              intersect: false,
+              mode: "point",
+            },
             plugins: {
+              title: {
+                display: true,
+                text: "PR Volume vs Success Rate",
+                color: "#1f2937",
+                font: {
+                  family: "Inter",
+                  size: 16,
+                  weight: "600",
+                },
+                padding: 20,
+              },
               legend: {
-                position: "top",
+                display: true,
+                position: "right",
                 labels: {
-                  color: "#94a3b8",
-                  font: { family: "Inter", size: 11 },
-                  padding: 15,
                   usePointStyle: true,
+                  pointStyle: "circle",
+                  color: "#64748b",
+                  font: {
+                    family: "Inter",
+                    size: 11,
+                    weight: "500",
+                  },
+                  padding: 15,
+                  boxWidth: 12,
                 },
               },
-            },
-            scales: {
-              x: {
-                grid: { color: "#334155" },
-                ticks: { color: "#94a3b8", font: { size: 10 } },
-              },
-              y: {
-                grid: { color: "#334155" },
-                ticks: { color: "#94a3b8", font: { size: 10 } },
-              },
-            },
-          },
-        });
-        console.log("Volume chart initialized");
-      }
+              tooltip: {
+                titleColor: "#1f2937",
+                bodyColor: "#374151",
+                backgroundColor: "rgba(255, 255, 255, 0.95)",
+                borderColor: "#e5e7eb",
+                borderWidth: 1,
+                callbacks: {
+                  title: function (context) {
+                    return context[0].label;
+                  },
+                  label: function (context) {
+                    const datasetLabel = context.dataset.label;
+                    const value = context.parsed.y;
 
-      function initSuccessChart(data) {
-        console.log("Initializing success chart...");
-        const ctx = document.getElementById("successChart").getContext("2d");
-
-        // Filter data to show only success rate datasets (lines)
-        const successData = {
-          labels: data.labels,
-          datasets: data.datasets.filter(
-            (dataset) =>
-              dataset.type === "line" && dataset.label.includes("Success")
-          ),
-        };
-
-        console.log("Success chart data:", successData);
-
-        successChart = new Chart(ctx, {
-          type: "line",
-          data: successData,
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                position: "top",
-                labels: {
-                  color: "#94a3b8",
-                  font: { family: "Inter", size: 11 },
-                  padding: 15,
-                  usePointStyle: true,
-                },
-              },
-            },
-            scales: {
-              x: {
-                grid: { color: "#334155" },
-                ticks: { color: "#94a3b8", font: { size: 10 } },
-              },
-              y: {
-                min: 0,
-                max: 100,
-                grid: { color: "#334155" },
-                ticks: {
-                  color: "#94a3b8",
-                  font: { size: 10 },
-                  callback: function (value) {
-                    return value + "%";
+                    if (datasetLabel.includes("Success %")) {
+                      return datasetLabel + ": " + value.toFixed(1) + "%";
+                    } else {
+                      return (
+                        datasetLabel + ": " + value.toLocaleString() + " PRs"
+                      );
+                    }
                   },
                 },
               },
             },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: "Time",
+                  color: "#475569",
+                  font: {
+                    family: "Inter",
+                    size: 12,
+                    weight: "500",
+                  },
+                },
+                grid: { color: "#f1f5f9", lineWidth: 1 },
+                ticks: {
+                  color: "#475569",
+                  font: { family: "Inter", size: 11 },
+                  maxRotation: 45,
+                  minRotation: 0
+                },
+              },
+              y: {
+                type: "linear",
+                display: true,
+                position: "left",
+                title: {
+                  display: true,
+                  text: "Number of PRs",
+                  color: "#475569",
+                  font: {
+                    family: "Inter",
+                    size: 12,
+                    weight: "500",
+                  },
+                },
+                grid: { color: "#f1f5f9", lineWidth: 1 },
+                ticks: {
+                  color: "#475569",
+                  font: { family: "Inter", size: 11 },
+                  callback: function(value) {
+                    return value.toLocaleString();
+                  }
+                },
+                beginAtZero: true,
+              },
+              y1: {
+                type: "linear",
+                display: true,
+                position: "right",
+                title: {
+                  display: true,
+                  text: "Success Rate (%)",
+                  color: "#475569",
+                  font: {
+                    family: "Inter",
+                    size: 12,
+                    weight: "500",
+                  },
+                },
+                ticks: {
+                  color: "#475569",
+                  font: { family: "Inter", size: 11 },
+                  callback: function (value) {
+                    return value + "%";
+                  },
+                },
+                beginAtZero: true,
+                max: 100,
+                grid: {
+                  drawOnChartArea: false,
+                },
+              },
+            },
           },
         });
-        console.log("Success chart initialized");
+
+        console.log("Chart initialized");
+
+        // Set up toggle functionality
+        setupToggleButtons();
+      }
+
+      function setupToggleButtons() {
+        const toggleButtons = document.querySelectorAll(".toggle-btn");
+        const viewButtons = document.querySelectorAll(".view-btn");
+
+        // Agent toggle functionality
+        toggleButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const agent = this.dataset.agent;
+            const isActive = this.classList.contains("active");
+
+            // Toggle button state
+            this.classList.toggle("active");
+
+            // Get current view mode
+            const activeViewBtn = document.querySelector(".view-btn.active");
+            const currentView = activeViewBtn
+              ? activeViewBtn.dataset.view
+              : "all";
+
+            // Find and toggle datasets for this agent
+            chartInstance.data.datasets.forEach((dataset, index) => {
+              const labelLower = dataset.label.toLowerCase();
+              if (labelLower.includes(agent)) {
+                const isLine = dataset.type === "line";
+                const isBar = dataset.type === "bar";
+
+                if (isActive) {
+                  // Was active, now hiding
+                  dataset.hidden = true;
+                } else {
+                  // Was hidden, now showing (but respect view mode)
+                  switch (currentView) {
+                    case "all":
+                      dataset.hidden = false;
+                      break;
+                    case "bars":
+                      dataset.hidden = isLine;
+                      break;
+                    case "lines":
+                      dataset.hidden = isBar;
+                      break;
+                  }
+                }
+              }
+            });
+
+            chartInstance.update();
+          });
+        });
+
+        // View mode functionality
+        viewButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const view = this.dataset.view;
+
+            // Update button states
+            viewButtons.forEach((btn) => btn.classList.remove("active"));
+            this.classList.add("active");
+
+            // Show/hide datasets based on view mode and agent toggles
+            chartInstance.data.datasets.forEach((dataset) => {
+              const isLine = dataset.type === "line";
+              const isBar = dataset.type === "bar";
+
+              // Get the agent name from the dataset label
+              const agentMatch = dataset.label
+                .toLowerCase()
+                .match(/(copilot|codex|cursor|devin|codegen)/);
+              const agent = agentMatch ? agentMatch[1] : null;
+
+              // Check if agent is currently enabled
+              const agentButton = document.querySelector(
+                `.toggle-btn[data-agent="${agent}"]`
+              );
+              const agentEnabled =
+                agentButton && agentButton.classList.contains("active");
+
+              switch (view) {
+                case "all":
+                  dataset.hidden = !agentEnabled;
+                  break;
+                case "bars":
+                  dataset.hidden = !agentEnabled || isLine;
+                  break;
+                case "lines":
+                  dataset.hidden = !agentEnabled || isBar;
+                  break;
+              }
+            });
+
+            chartInstance.update();
+          });
+        });
       }
     </script>
   </body>
