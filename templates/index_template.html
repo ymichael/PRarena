@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Coding Agents</title>
+    <title>PR Arena - AI Coding Agent Leaderboard</title>
     <link rel="stylesheet" href="styles.css" />
     <meta http-equiv="refresh" content="3600" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
@@ -18,8 +18,8 @@
   <body>
     <div class="container">
       <header class="hero">
-        <h1>AI Coding Agents</h1>
-        <p>Which AI writes the most successful code?</p>
+        <h1>PR Arena</h1>
+        <p>Software engineering agents head to head</p>
       </header>
 
       <!-- Dynamic Leaderboard -->
@@ -82,7 +82,7 @@
 
       <!-- Historic Chart -->
       <section class="chart">
-        <h2>Historic Chart</h2>
+        <h2>PR Volume vs. Success Rate</h2>
         <div class="chart-controls">
           <div class="control-row">
             <div class="control-section">
@@ -240,15 +240,7 @@
             },
             plugins: {
               title: {
-                display: true,
-                text: "PR Volume vs Success Rate",
-                color: "#1f2937",
-                font: {
-                  family: "Inter",
-                  size: 16,
-                  weight: "600",
-                },
-                padding: 20,
+                display: false,
               },
               legend: {
                 display: true,
