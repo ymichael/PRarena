@@ -53,8 +53,8 @@ AGENTS = [
         "long_name": "Devin",
         "color": "#059669",
         "info_url": "https://devin.ai/pricing",
-        "total_query_url": "https://github.com/search?q=author:devin-ai-integration[bot]&type=pullrequests",
-        "merged_query_url": "https://github.com/search?q=author:devin-ai-integration[bot]+is:merged&type=pullrequests",
+        "total_query_url": "https://github.com/search?q=is:pr+author:devin-ai-integration[bot]&type=pullrequests",
+        "merged_query_url": "https://github.com/search?q=is:pr+author:devin-ai-integration[bot]+is:merged&type=pullrequests",
     },
     {
         "key": "codegen",
@@ -62,8 +62,8 @@ AGENTS = [
         "long_name": "Codegen",
         "color": "#d97706",
         "info_url": "https://codegen.com/",
-        "total_query_url": "https://github.com/search?q=author:codegen-sh[bot]&type=pullrequests",
-        "merged_query_url": "https://github.com/search?q=author:codegen-sh[bot]+is:merged&type=pullrequests",
+        "total_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]&type=pullrequests",
+        "merged_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:merged&type=pullrequests",
     },
 ]
 
