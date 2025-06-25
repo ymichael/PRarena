@@ -20,12 +20,12 @@ Explore the GitHub search queries used:
 - **Merged Cursor PRs**: [https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests](https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests)
   
 
-- **All Devin PRs**: [https://github.com/search?q=author:devin-ai-integration[bot]&type=pullrequests](https://github.com/search?q=author:devin-ai-integration[bot]&type=pullrequests)
-- **Merged Devin PRs**: [https://github.com/search?q=author:devin-ai-integration[bot]+is:merged&type=pullrequests](https://github.com/search?q=author:devin-ai-integration[bot]+is:merged&type=pullrequests)
+- **All Devin PRs**: [https://github.com/search?q=is:pr+author:devin-ai-integration[bot]&type=pullrequests](https://github.com/search?q=is:pr+author:devin-ai-integration[bot]&type=pullrequests)
+- **Merged Devin PRs**: [https://github.com/search?q=is:pr+author:devin-ai-integration[bot]+is:merged&type=pullrequests](https://github.com/search?q=is:pr+author:devin-ai-integration[bot]+is:merged&type=pullrequests)
   
 
-- **All Codegen PRs**: [https://github.com/search?q=author:codegen-sh[bot]&type=pullrequests](https://github.com/search?q=author:codegen-sh[bot]&type=pullrequests)
-- **Merged Codegen PRs**: [https://github.com/search?q=author:codegen-sh[bot]+is:merged&type=pullrequests](https://github.com/search?q=author:codegen-sh[bot]+is:merged&type=pullrequests)
+- **All Codegen PRs**: [https://github.com/search?q=is:pr+author:codegen-sh[bot]&type=pullrequests](https://github.com/search?q=is:pr+author:codegen-sh[bot]&type=pullrequests)
+- **Merged Codegen PRs**: [https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:merged&type=pullrequests](https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:merged&type=pullrequests)
   
 
 ---
@@ -36,8 +36,8 @@ Explore the GitHub search queries used:
 
 | Project | Total PRs | Merged PRs | Merge Rate |
 | ------- | --------- | ---------- | ---------- |
-| Copilot | 17,971 | 10,929 | 60.81% |
-| Codex | 485,083 | 416,935 | 85.95% |
-| Cursor | 2,435 | 1,789 | 73.47% |
-| Devin | 30,228 | 18,449 | 61.03% |
-| Codegen | 4,165 | 1,692 | 40.62% |
+| Copilot | 18,035 | 10,967 | 60.81% |
+| Codex | 486,876 | 418,524 | 85.96% |
+| Cursor | 2,444 | 1,798 | 73.57% |
+| Devin | 28,970 | 18,470 | 63.76% |
+| Codegen | 4,148 | 1,692 | 40.79% |

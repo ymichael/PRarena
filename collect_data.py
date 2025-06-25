@@ -1,38 +1,74 @@
 import csv
 import datetime as dt
+import os
 import re
 from pathlib import Path
 import requests
+import time
 
-# Basic headers for GitHub public API
-HEADERS = {"Accept": "application/vnd.github+json", "User-Agent": "PR-Watcher"}
 
-# Search queries - tracking merged PRs
+# GitHub API headers with optional authentication
+def get_headers():
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "PR-Watcher"}
+
+    # Add authentication if token is available
+    github_token = os.getenv("GITHUB_TOKEN")
+    if github_token:
+        headers["Authorization"] = f"Bearer {github_token}"
+        print("Using authenticated GitHub API requests")
+    else:
+        print("Using unauthenticated GitHub API requests (rate limited)")
+
+    return headers
+
+
+# Search queries - tracking all PR metrics
+# Organized by agent: total, merged, non-draft for each
 Q = {
+    # Copilot metrics
     "is:pr+head:copilot/": "copilot_total",
     "is:pr+head:copilot/+is:merged": "copilot_merged",
+    "is:pr+head:copilot/+-is:draft": "copilot_nondraft",
+    # Codex metrics
     "is:pr+head:codex/": "codex_total",
     "is:pr+head:codex/+is:merged": "codex_merged",
+    "is:pr+head:codex/+-is:draft": "codex_nondraft",
+    # Cursor metrics
     "is:pr+head:cursor/": "cursor_total",
     "is:pr+head:cursor/+is:merged": "cursor_merged",
-    "author:devin-ai-integration[bot]": "devin_total",
-    "author:devin-ai-integration[bot]+is:merged": "devin_merged",
-    "author:codegen-sh[bot]": "codegen_total",
-    "author:codegen-sh[bot]+is:merged": "codegen_merged",
+    "is:pr+head:cursor/+-is:draft": "cursor_nondraft",
+    # Devin metrics
+    "is:pr+author:devin-ai-integration[bot]": "devin_total",
+    "is:pr+author:devin-ai-integration[bot]+is:merged": "devin_merged",
+    "is:pr+author:devin-ai-integration[bot]+-is:draft": "devin_nondraft",
+    # Codegen metrics
+    "is:pr+author:codegen-sh[bot]": "codegen_total",
+    "is:pr+author:codegen-sh[bot]+is:merged": "codegen_merged",
+    "is:pr+author:codegen-sh[bot]+-is:draft": "codegen_nondraft",
 }
 
 
 def collect_data():
-    # Get data from GitHub API
+    # Get data from GitHub API - 15 metrics total (3 per agent: total, merged, non-draft)
     cnt = {}
+
+    # Get headers with authentication if available
+    headers = get_headers()
+
+    # Collect all metrics in one loop
     for query, key in Q.items():
+        print(f"Collecting {key}...")
         r = requests.get(
             f"https://api.github.com/search/issues?q={query}",
-            headers=HEADERS,
+            headers=headers,
             timeout=30,
         )
         r.raise_for_status()
         cnt[key] = r.json()["total_count"]
+        print(f"  {key}: {cnt[key]}")
+
+        # Rate limiting: wait 2 seconds between API calls
+        time.sleep(2)
 
     # Save data to CSV
     timestamp = dt.datetime.now(dt.UTC).strftime("%Y‑%m‑%d %H:%M:%S")
@@ -48,6 +84,11 @@ def collect_data():
         cnt["devin_merged"],
         cnt["codegen_total"],
         cnt["codegen_merged"],
+        cnt["copilot_nondraft"],
+        cnt["codex_nondraft"],
+        cnt["cursor_nondraft"],
+        cnt["devin_nondraft"],
+        cnt["codegen_nondraft"],
     ]
 
     csv_file = Path("data.csv")
@@ -68,6 +109,11 @@ def collect_data():
                     "devin_merged",
                     "codegen_total",
                     "codegen_merged",
+                    "copilot_nondraft",
+                    "codex_nondraft",
+                    "cursor_nondraft",
+                    "devin_nondraft",
+                    "codegen_nondraft",
                 ]
             )
         writer.writerow(row)
