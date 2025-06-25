@@ -76,13 +76,21 @@ def build_stats(latest, df=None):
         key = agent["key"]
         total = int(latest[f"{key}_total"])
         merged = int(latest[f"{key}_merged"])
-        rate = (merged / total * 100) if total > 0 else 0
+        nondraft = (
+            int(latest[f"{key}_nondraft"]) if f"{key}_nondraft" in latest else total
+        )
 
-        # Simple, meaningful stats only
+        # Calculate rates for different PR types
+        total_rate = (merged / total * 100) if total > 0 else 0
+        ready_rate = (merged / nondraft * 100) if nondraft > 0 else 0
+
         stats[key] = {
             "total": total,
             "merged": merged,
-            "rate": rate,
+            "nondraft": nondraft,  # ready PRs (non-draft)
+            "rate": ready_rate,  # Default to ready PR success rate
+            "total_rate": total_rate,  # Success rate including drafts
+            "ready_rate": ready_rate,  # Success rate for ready PRs only
         }
     return stats
 

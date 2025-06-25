@@ -242,6 +242,238 @@ body {
   box-shadow: 0 1px 3px 0 rgba(99, 102, 241, 0.25);
 }
 
+/* Dropdown styles */
+.dropdown-container {
+  position: relative;
+}
+
+.dropdown-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dropdown-arrow {
+  font-size: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.mode-indicator {
+  font-weight: 400;
+  opacity: 0.7;
+  font-size: 0.625rem;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: all 0.15s ease;
+  min-width: 160px;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-family: "IBM Plex Mono", "SF Mono", Monaco, monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: none;
+  letter-spacing: 0;
+  border-radius: 0;
+}
+
+.dropdown-item:first-child {
+  border-radius: 5px 5px 0 0;
+}
+
+.dropdown-item:last-child {
+  border-radius: 0 0 5px 5px;
+}
+
+.dropdown-item:hover {
+  background: #f8fafc;
+  color: #1f2937;
+}
+
+.dropdown-item.active {
+  background: #f0f4ff;
+  color: #6366f1;
+  font-weight: 600;
+}
+
+/* Enhanced agent subtitle styling */
+.agent-subtitle {
+  font-size: 0.6875rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.agent-subtitle .pr-count {
+  font-weight: 600;
+  color: #374151;
+}
+
+.agent-subtitle .pr-type {
+  font-weight: 600;
+  color: #6366f1;
+}
+
+.agent-subtitle .pr-total {
+  color: #9ca3af;
+}
+
+.agent-subtitle .pr-total-label {
+  color: #9ca3af;
+}
+
+/* Enhanced secondary metrics */
+.secondary-metrics {
+  display: flex;
+  gap: 1.5rem;
+  align-items: baseline;
+}
+
+.secondary-metrics .metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 60px;
+}
+
+.secondary-metrics .metric .metric-count {
+  font-weight: 600;
+  color: #374151;
+  line-height: 1.2;
+  margin-bottom: 0.125rem;
+}
+
+.secondary-metrics .metric span:last-child {
+  font-size: 0.6875rem;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+/* Definitions section */
+.definitions {
+  margin-bottom: 3rem;
+}
+
+.explanation-section {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fafbfc;
+  overflow: hidden;
+}
+
+.explanation-toggle {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-family: "IBM Plex Mono", "SF Mono", Monaco, monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+}
+
+.explanation-toggle:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.explanation-toggle .toggle-text {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.875rem;
+  color: var(--color-primary);
+}
+
+.explanation-toggle .toggle-arrow {
+  font-size: 0.625rem;
+  transition: transform 0.2s ease;
+}
+
+.explanation-toggle.expanded .toggle-arrow {
+  transform: rotate(180deg);
+}
+
+.explanation-content {
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  background: #ffffff;
+}
+
+.explanation-content.expanded {
+  padding: 1rem 1rem 1.25rem;
+  max-height: 300px;
+}
+
+.explanation-content p {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.explanation-content p:last-child {
+  margin-bottom: 0;
+}
+
+.explanation-content ul {
+  margin: 0 0 0.75rem 0;
+  padding-left: 1.25rem;
+}
+
+.explanation-content li {
+  margin-bottom: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+.explanation-content strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
 .agent {
   background: #ffffff;
   border: none;

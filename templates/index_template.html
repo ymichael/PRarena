@@ -36,7 +36,15 @@
         <div class="leaderboard-header">
           <h2>Leaderboard</h2>
           <div class="sort-controls">
-            <button class="sort-btn active" data-sort="success-rate">Success Rate</button>
+            <div class="dropdown-container">
+              <button class="sort-btn dropdown-btn active" data-sort="success-rate" id="successRateBtn">
+                Success Rate <span class="mode-indicator">w/o drafts</span> <span class="dropdown-arrow">▼</span>
+              </button>
+              <div class="dropdown-menu" id="successRateDropdown">
+                <button class="dropdown-item active" data-rate-type="ready">Ready PRs only</button>
+                <button class="dropdown-item" data-rate-type="total">Include draft PRs</button>
+              </div>
+            </div>
             <button class="sort-btn" data-sort="total-prs">Total PRs</button>
             <button class="sort-btn" data-sort="merged-prs">Merged PRs</button>
           </div>
@@ -46,7 +54,10 @@
 {% for agent in agents %}
           <div class="agent"
                data-success-rate="{{ stats[agent.key].rate }}"
+               data-success-rate-ready="{{ stats[agent.key].ready_rate }}"
+               data-success-rate-total="{{ stats[agent.key].total_rate }}"
                data-total-prs="{{ stats[agent.key].total }}"
+               data-ready-prs="{{ stats[agent.key].nondraft }}"
                data-merged-prs="{{ stats[agent.key].merged }}"
                data-agent-name="{{ agent.long_name }}">
             <div class="agent-header">
@@ -54,7 +65,12 @@
               <div class="agent-dot" style="background-color: {{ agent.color }}"></div>
               <div class="agent-info">
                 <h3><a href="{{ agent.info_url }}" target="_blank">{{ agent.long_name }}</a></h3>
-                <span class="agent-subtitle">{{ stats[agent.key].total | comma }} PRs</span>
+                <span class="agent-subtitle">
+                  <span class="pr-count">{{ stats[agent.key].nondraft | comma }}</span>
+                  <span class="pr-type">ready</span> /
+                  <span class="pr-total">{{ stats[agent.key].total | comma }}</span>
+                  <span class="pr-total-label">all PRs</span>
+                </span>
               </div>
             </div>
             <div class="metrics">
@@ -67,13 +83,17 @@
               <div class="secondary-metrics">
                 <div class="metric">
                   <a href="{{ agent.total_query_url }}" target="_blank"
-                    >{{ stats[agent.key].total | comma }}</a
+                    ><span class="metric-count">{{ stats[agent.key].total | comma }}</span></a
                   >
-                  <span>total PRs</span>
+                  <span>all PRs</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-count">{{ stats[agent.key].nondraft | comma }}</span>
+                  <span>ready</span>
                 </div>
                 <div class="metric">
                   <a href="{{ agent.merged_query_url }}" target="_blank"
-                    >{{ stats[agent.key].merged | comma }}</a
+                    ><span class="metric-count">{{ stats[agent.key].merged | comma }}</span></a
                   >
                   <span>merged</span>
                 </div>
@@ -87,6 +107,26 @@
           </div>
         </div>
         {% endfor %}
+      </section>
+
+      <!-- Definitions section -->
+      <section class="definitions">
+        <div class="explanation-section">
+          <button class="explanation-toggle" id="explanationToggle">
+            <span class="toggle-text">Definitions</span>
+            <span class="toggle-arrow">▼</span>
+          </button>
+          <div class="explanation-content" id="explanationContent">
+            <p>Different AI coding agents follow different workflows when creating pull requests:</p>
+            <ul>
+              <li><strong>All PRs:</strong> Every pull request created by an agent, including DRAFT PRs.</li>
+              <li><strong>Ready PRs:</strong> Non-draft pull requests that are ready for review and merging</li>
+              <li><strong>Merged PRs:</strong> Pull requests that were successfully merged into the codebase</li>
+            </ul>
+            <p><strong>Key workflow differences:</strong> Some agents like <strong>Codex</strong> iterate privately and create ready PRs directly, resulting in very few drafts but high merge rates. Others like <strong>Copilot</strong> and <strong>Codegen</strong> create draft PRs first, encouraging public iteration before marking them ready for review.</p>
+            <p>By default, we show success rates using <strong>Ready PRs only</strong> to fairly compare agents across different workflows. This focuses on each agent's ability to produce mergeable code, regardless of whether they iterate publicly (with drafts) or privately. Toggle to "Include draft PRs" to see the complete picture of all activity.</p>
+          </div>
+        </div>
       </section>
 
       <!-- Historic Chart -->
@@ -145,9 +185,12 @@
     <script>
       // Chart instance
       let chartInstance = null;
+      let currentRateType = 'ready'; // Track current success rate type
 
       document.addEventListener("DOMContentLoaded", function () {
         initializeSorting();
+        initializeDropdown();
+        initializeExplanation();
         loadCharts();
         // Sort by success rate on page load
         sortAgents("success-rate");
@@ -157,14 +200,129 @@
       function initializeSorting() {
         const sortButtons = document.querySelectorAll(".sort-btn");
         sortButtons.forEach((btn) => {
-          btn.addEventListener("click", () => {
-            // Update active button
-            sortButtons.forEach((b) => b.classList.remove("active"));
-            btn.classList.add("active");
+          if (!btn.classList.contains('dropdown-btn')) {
+            btn.addEventListener("click", () => {
+              // Update active button
+              sortButtons.forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
 
-            // Sort agents
-            sortAgents(btn.dataset.sort);
+              // Sort agents
+              sortAgents(btn.dataset.sort);
+            });
+          }
+        });
+      }
+
+      function initializeDropdown() {
+        const dropdownBtn = document.getElementById('successRateBtn');
+        const dropdown = document.getElementById('successRateDropdown');
+        const dropdownItems = document.querySelectorAll('.dropdown-item');
+        const arrow = dropdownBtn.querySelector('.dropdown-arrow');
+
+        // Toggle dropdown
+        dropdownBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isShowing = dropdown.classList.contains('show');
+          dropdown.classList.toggle('show');
+
+          // Rotate arrow
+          if (dropdown.classList.contains('show')) {
+            arrow.style.transform = 'rotate(180deg)';
+          } else {
+            arrow.style.transform = 'rotate(0deg)';
+          }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+          dropdown.classList.remove('show');
+          arrow.style.transform = 'rotate(0deg)';
+        });
+
+        // Handle dropdown item selection
+        dropdownItems.forEach(item => {
+          item.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            // Update active item
+            dropdownItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            // Update rate type
+            currentRateType = item.dataset.rateType;
+
+            // Update button text to show current mode
+            const modeText = currentRateType === 'ready' ? 'w/o drafts' : 'w/ drafts';
+            dropdownBtn.innerHTML = `Success Rate <span class="mode-indicator">${modeText}</span> <span class="dropdown-arrow">▼</span>`;
+
+            // Update all agents' data and resort
+            updateAgentMetrics(currentRateType);
+            sortAgents('success-rate');
+
+            // Close dropdown
+            dropdown.classList.remove('show');
+            arrow.style.transform = 'rotate(0deg)';
+
+            // Make sure success rate button is active
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+            dropdownBtn.classList.add('active');
           });
+        });
+      }
+
+      function initializeExplanation() {
+        const toggle = document.getElementById('explanationToggle');
+        const content = document.getElementById('explanationContent');
+        const arrow = toggle.querySelector('.toggle-arrow');
+
+        toggle.addEventListener('click', () => {
+          const isExpanded = content.classList.contains('expanded');
+
+          if (isExpanded) {
+            content.classList.remove('expanded');
+            toggle.classList.remove('expanded');
+          } else {
+            content.classList.add('expanded');
+            toggle.classList.add('expanded');
+          }
+        });
+      }
+
+      function updateAgentMetrics(rateType) {
+        const agents = document.querySelectorAll('.agent');
+
+        agents.forEach(agent => {
+          const rate = rateType === 'ready'
+            ? parseFloat(agent.dataset.successRateReady)
+            : parseFloat(agent.dataset.successRateTotal);
+
+          // Update the data attribute for sorting
+          agent.dataset.successRate = rate;
+
+          // Update the primary metric display
+          const metricValue = agent.querySelector('.metric-value');
+          metricValue.textContent = rate.toFixed(1) + '%';
+
+          // Update the progress bar
+          const progressBar = agent.querySelector('.progress');
+          progressBar.style.width = rate + '%';
+
+          // Update subtitle to highlight the current mode
+          const subtitle = agent.querySelector('.agent-subtitle');
+          const prCount = subtitle.querySelector('.pr-count');
+          const prType = subtitle.querySelector('.pr-type');
+
+          if (rateType === 'ready') {
+            prCount.textContent = parseInt(agent.dataset.readyPrs).toLocaleString();
+            prType.textContent = 'ready';
+            prType.style.fontWeight = '600';
+            subtitle.querySelector('.pr-total-label').style.opacity = '0.6';
+          } else {
+            prCount.textContent = parseInt(agent.dataset.totalPrs).toLocaleString();
+            prType.textContent = 'all';
+            prType.style.fontWeight = '600';
+            subtitle.querySelector('.pr-total-label').style.opacity = '1';
+          }
         });
       }
 
