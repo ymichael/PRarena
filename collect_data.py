@@ -67,8 +67,8 @@ def collect_data():
         cnt[key] = r.json()["total_count"]
         print(f"  {key}: {cnt[key]}")
 
-        # Rate limiting: wait 2 seconds between API calls
-        time.sleep(2)
+        # Rate limiting: wait half a second between API calls
+        time.sleep(0.5)
 
     # Save data to CSV
     timestamp = dt.datetime.now(dt.UTC).strftime("%Y‑%m‑%d %H:%M:%S")

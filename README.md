@@ -2,6 +2,18 @@
 
 View the [interactive dashboard](https://aavetis.github.io/ai-pr-watcher/) for these statistics.
 
+## Understanding the Metrics
+
+Different AI coding agents follow different workflows when creating pull requests:
+
+- **All PRs**: Every pull request created by an agent, including DRAFT PRs
+- **Ready PRs**: Non-draft pull requests that are ready for review and merging
+- **Merged PRs**: Pull requests that were successfully merged into the codebase
+
+**Key workflow differences**: Some agents like **Codex** iterate privately and create ready PRs directly, resulting in very few drafts but high merge rates. Others like **Copilot** and **Codegen** create draft PRs first, encouraging public iteration before marking them ready for review.
+
+The statistics below focus on **Ready PRs only** to fairly compare agents across different workflows, measuring each agent's ability to produce mergeable code regardless of whether they iterate publicly (with drafts) or privately.
+
 ## Data sources
 
 Explore the GitHub search queries used:
@@ -34,10 +46,10 @@ Explore the GitHub search queries used:
 
 ## Current Statistics
 
-| Project | Total PRs | Merged PRs | Merge Rate |
-| ------- | --------- | ---------- | ---------- |
-| Copilot | 19,278 | 11,627 | 60.31% |
-| Codex | 512,929 | 442,119 | 86.19% |
-| Cursor | 2,759 | 2,026 | 73.43% |
-| Devin | 29,190 | 18,620 | 63.79% |
-| Codegen | 4,174 | 1,695 | 40.61% |
+| Project | Ready PRs | Merged PRs | Success Rate |
+| ------- | --------- | ---------- | ------------ |
+| Copilot | 12,630 | 11,664 | 92.35% |
+| Codex | 507,595 | 442,896 | 87.25% |
+| Cursor | 2,684 | 2,034 | 75.78% |
+| Devin | 28,343 | 18,621 | 65.7% |
+| Codegen | 2,090 | 1,695 | 81.1% |
