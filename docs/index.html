@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PR Arena - AI Coding Agent Leaderboard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
     <link rel="stylesheet" href="styles.css" />
     <meta http-equiv="refresh" content="3600" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
@@ -36,8 +37,16 @@
         <div class="leaderboard-header">
           <h2>Leaderboard</h2>
           <div class="sort-controls">
-            <button class="sort-btn active" data-sort="success-rate">Success Rate</button>
-            <button class="sort-btn" data-sort="total-prs">Total PRs</button>
+            <div class="dropdown-container">
+              <button class="sort-btn dropdown-btn" data-sort="success-rate" id="successRateBtn">
+                Success Rate <span class="mode-indicator">(M/R)</span> <span class="dropdown-arrow">▼</span>
+              </button>
+              <div class="dropdown-menu" id="successRateDropdown">
+                <button class="dropdown-item active" data-rate-type="ready">Merged/Ready PRs</button>
+                <button class="dropdown-item" data-rate-type="total">Merged/All PRs, including drafts</button>
+              </div>
+            </div>
+            <button class="sort-btn active" data-sort="total-prs">Total PRs</button>
             <button class="sort-btn" data-sort="merged-prs">Merged PRs</button>
           </div>
         </div>
@@ -45,225 +54,315 @@
         <div class="agents-container" id="agentsContainer">
 
           <div class="agent"
-               data-success-rate="60.79702915419577"
-               data-total-prs="18042"
-               data-merged-prs="10969"
+               data-success-rate="92.32355273592387"
+               data-success-rate-ready="92.32355273592387"
+               data-success-rate-total="60.33374792703151"
+               data-total-prs="19296"
+               data-ready-prs="12610"
+               data-merged-prs="11642"
                data-agent-name="GitHub Copilot">
             <div class="agent-header">
               <div class="rank" data-rank="1">#1</div>
               <div class="agent-dot" style="background-color: #2563eb"></div>
               <div class="agent-info">
                 <h3><a href="https://docs.github.com/en/copilot/using-github-copilot/coding-agent/using-copilot-to-work-on-an-issue" target="_blank">GitHub Copilot</a></h3>
-                <span class="agent-subtitle">18,042 PRs</span>
+                <span class="agent-subtitle">
+                  <span class="pr-count">12,610</span>
+                  <span class="pr-type">ready</span> /
+                  <span class="pr-total">19,296</span>
+                  <span class="pr-total-label">all PRs</span>
+                </span>
               </div>
             </div>
             <div class="metrics">
               <div class="primary-metric">
                 <span class="metric-value">
-                  60.8%
+                  92.3%
                 </span>
                 <span class="metric-label">Success Rate</span>
               </div>
               <div class="secondary-metrics">
-                <div class="metric">
-                  <a href="https://github.com/search?q=is:pr+head:copilot/&type=pullrequests" target="_blank"
-                    >18,042</a
-                  >
-                  <span>total PRs</span>
+                <div class="metric draft-metric">
+                  <a href="https://github.com/search?q=is:pr+head:copilot/+is:draft&type=pullrequests" target="_blank">
+                    <span class="metric-count">6,686</span>
+                    <span>draft</span>
+                  </a>
                 </div>
                 <div class="metric">
-                  <a href="https://github.com/search?q=is:pr+head:copilot/+is:merged&type=pullrequests" target="_blank"
-                    >10,969</a
-                  >
-                  <span>merged</span>
+                  <a href="https://github.com/search?q=is:pr+head:copilot/+-is:draft&type=pullrequests" target="_blank">
+                    <span class="metric-count">12,610</span>
+                    <span>ready</span>
+                  </a>
+                </div>
+                <div class="metric">
+                  <a href="https://github.com/search?q=is:pr+head:copilot/+is:merged&type=pullrequests" target="_blank">
+                    <span class="metric-count">11,642</span>
+                    <span>merged</span>
+                  </a>
                 </div>
               </div>
             </div>
           <div class="progress-bar">
             <div
               class="progress"
-              style="width: 60.79702915419577%; background-color: #2563eb"
+              style="width: 92.32355273592387%; background-color: #2563eb"
             ></div>
           </div>
         </div>
         
           <div class="agent"
-               data-success-rate="85.96119451408953"
-               data-total-prs="486993"
-               data-merged-prs="418625"
+               data-success-rate="87.23880567576204"
+               data-success-rate-ready="87.23880567576204"
+               data-success-rate-total="86.19091047271623"
+               data-total-prs="513162"
+               data-ready-prs="506998"
+               data-merged-prs="442299"
                data-agent-name="OpenAI Codex">
             <div class="agent-header">
               <div class="rank" data-rank="2">#2</div>
               <div class="agent-dot" style="background-color: #dc2626"></div>
               <div class="agent-info">
                 <h3><a href="https://openai.com/index/introducing-codex/" target="_blank">OpenAI Codex</a></h3>
-                <span class="agent-subtitle">486,993 PRs</span>
+                <span class="agent-subtitle">
+                  <span class="pr-count">506,998</span>
+                  <span class="pr-type">ready</span> /
+                  <span class="pr-total">513,162</span>
+                  <span class="pr-total-label">all PRs</span>
+                </span>
               </div>
             </div>
             <div class="metrics">
               <div class="primary-metric">
                 <span class="metric-value">
-                  86.0%
+                  87.2%
                 </span>
                 <span class="metric-label">Success Rate</span>
               </div>
               <div class="secondary-metrics">
-                <div class="metric">
-                  <a href="https://github.com/search?q=is:pr+head:codex/&type=pullrequests" target="_blank"
-                    >486,993</a
-                  >
-                  <span>total PRs</span>
+                <div class="metric draft-metric">
+                  <a href="https://github.com/search?q=is:pr+head:codex/+is:draft&type=pullrequests" target="_blank">
+                    <span class="metric-count">6,164</span>
+                    <span>draft</span>
+                  </a>
                 </div>
                 <div class="metric">
-                  <a href="https://github.com/search?q=is:pr+head:codex/+is:merged&type=pullrequests" target="_blank"
-                    >418,625</a
-                  >
-                  <span>merged</span>
+                  <a href="https://github.com/search?q=is:pr+head:codex/+-is:draft&type=pullrequests" target="_blank">
+                    <span class="metric-count">506,998</span>
+                    <span>ready</span>
+                  </a>
+                </div>
+                <div class="metric">
+                  <a href="https://github.com/search?q=is:pr+head:codex/+is:merged&type=pullrequests" target="_blank">
+                    <span class="metric-count">442,299</span>
+                    <span>merged</span>
+                  </a>
                 </div>
               </div>
             </div>
           <div class="progress-bar">
             <div
               class="progress"
-              style="width: 85.96119451408953%; background-color: #dc2626"
+              style="width: 87.23880567576204%; background-color: #dc2626"
             ></div>
           </div>
         </div>
         
           <div class="agent"
-               data-success-rate="73.60032693093585"
-               data-total-prs="2447"
-               data-merged-prs="1801"
+               data-success-rate="75.8401792382375"
+               data-success-rate-ready="75.8401792382375"
+               data-success-rate-total="73.45388788426763"
+               data-total-prs="2765"
+               data-ready-prs="2678"
+               data-merged-prs="2031"
                data-agent-name="Cursor Agents">
             <div class="agent-header">
               <div class="rank" data-rank="3">#3</div>
               <div class="agent-dot" style="background-color: #7c3aed"></div>
               <div class="agent-info">
                 <h3><a href="https://docs.cursor.com/background-agent" target="_blank">Cursor Agents</a></h3>
-                <span class="agent-subtitle">2,447 PRs</span>
+                <span class="agent-subtitle">
+                  <span class="pr-count">2,678</span>
+                  <span class="pr-type">ready</span> /
+                  <span class="pr-total">2,765</span>
+                  <span class="pr-total-label">all PRs</span>
+                </span>
               </div>
             </div>
             <div class="metrics">
               <div class="primary-metric">
                 <span class="metric-value">
-                  73.6%
+                  75.8%
                 </span>
                 <span class="metric-label">Success Rate</span>
               </div>
               <div class="secondary-metrics">
-                <div class="metric">
-                  <a href="https://github.com/search?q=is:pr+head:cursor/&type=pullrequests" target="_blank"
-                    >2,447</a
-                  >
-                  <span>total PRs</span>
+                <div class="metric draft-metric">
+                  <a href="https://github.com/search?q=is:pr+head:cursor/+is:draft&type=pullrequests" target="_blank">
+                    <span class="metric-count">87</span>
+                    <span>draft</span>
+                  </a>
                 </div>
                 <div class="metric">
-                  <a href="https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests" target="_blank"
-                    >1,801</a
-                  >
-                  <span>merged</span>
+                  <a href="https://github.com/search?q=is:pr+head:cursor/+-is:draft&type=pullrequests" target="_blank">
+                    <span class="metric-count">2,678</span>
+                    <span>ready</span>
+                  </a>
+                </div>
+                <div class="metric">
+                  <a href="https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests" target="_blank">
+                    <span class="metric-count">2,031</span>
+                    <span>merged</span>
+                  </a>
                 </div>
               </div>
             </div>
           <div class="progress-bar">
             <div
               class="progress"
-              style="width: 73.60032693093585%; background-color: #7c3aed"
+              style="width: 75.8401792382375%; background-color: #7c3aed"
             ></div>
           </div>
         </div>
         
           <div class="agent"
-               data-success-rate="63.759061097687265"
-               data-total-prs="28970"
-               data-merged-prs="18471"
+               data-success-rate="65.70904214018493"
+               data-success-rate-ready="65.70904214018493"
+               data-success-rate-total="63.793044372108966"
+               data-total-prs="29185"
+               data-ready-prs="28334"
+               data-merged-prs="18618"
                data-agent-name="Devin">
             <div class="agent-header">
               <div class="rank" data-rank="4">#4</div>
               <div class="agent-dot" style="background-color: #059669"></div>
               <div class="agent-info">
                 <h3><a href="https://devin.ai/pricing" target="_blank">Devin</a></h3>
-                <span class="agent-subtitle">28,970 PRs</span>
+                <span class="agent-subtitle">
+                  <span class="pr-count">28,334</span>
+                  <span class="pr-type">ready</span> /
+                  <span class="pr-total">29,185</span>
+                  <span class="pr-total-label">all PRs</span>
+                </span>
               </div>
             </div>
             <div class="metrics">
               <div class="primary-metric">
                 <span class="metric-value">
-                  63.8%
+                  65.7%
                 </span>
                 <span class="metric-label">Success Rate</span>
               </div>
               <div class="secondary-metrics">
-                <div class="metric">
-                  <a href="https://github.com/search?q=is:pr+author:devin-ai-integration[bot]&type=pullrequests" target="_blank"
-                    >28,970</a
-                  >
-                  <span>total PRs</span>
+                <div class="metric draft-metric">
+                  <a href="https://github.com/search?q=is:pr+author:devin-ai-integration[bot]+is:draft&type=pullrequests" target="_blank">
+                    <span class="metric-count">851</span>
+                    <span>draft</span>
+                  </a>
                 </div>
                 <div class="metric">
-                  <a href="https://github.com/search?q=is:pr+author:devin-ai-integration[bot]+is:merged&type=pullrequests" target="_blank"
-                    >18,471</a
-                  >
-                  <span>merged</span>
+                  <a href="https://github.com/search?q=is:pr+author:devin-ai-integration[bot]+-is:draft&type=pullrequests" target="_blank">
+                    <span class="metric-count">28,334</span>
+                    <span>ready</span>
+                  </a>
+                </div>
+                <div class="metric">
+                  <a href="https://github.com/search?q=is:pr+author:devin-ai-integration[bot]+is:merged&type=pullrequests" target="_blank">
+                    <span class="metric-count">18,618</span>
+                    <span>merged</span>
+                  </a>
                 </div>
               </div>
             </div>
           <div class="progress-bar">
             <div
               class="progress"
-              style="width: 63.759061097687265%; background-color: #059669"
+              style="width: 65.70904214018493%; background-color: #059669"
             ></div>
           </div>
         </div>
         
           <div class="agent"
-               data-success-rate="40.790742526518805"
-               data-total-prs="4148"
-               data-merged-prs="1692"
+               data-success-rate="81.13930110100527"
+               data-success-rate-ready="81.13930110100527"
+               data-success-rate-total="40.6085289889794"
+               data-total-prs="4174"
+               data-ready-prs="2089"
+               data-merged-prs="1695"
                data-agent-name="Codegen">
             <div class="agent-header">
               <div class="rank" data-rank="5">#5</div>
               <div class="agent-dot" style="background-color: #d97706"></div>
               <div class="agent-info">
                 <h3><a href="https://codegen.com/" target="_blank">Codegen</a></h3>
-                <span class="agent-subtitle">4,148 PRs</span>
+                <span class="agent-subtitle">
+                  <span class="pr-count">2,089</span>
+                  <span class="pr-type">ready</span> /
+                  <span class="pr-total">4,174</span>
+                  <span class="pr-total-label">all PRs</span>
+                </span>
               </div>
             </div>
             <div class="metrics">
               <div class="primary-metric">
                 <span class="metric-value">
-                  40.8%
+                  81.1%
                 </span>
                 <span class="metric-label">Success Rate</span>
               </div>
               <div class="secondary-metrics">
-                <div class="metric">
-                  <a href="https://github.com/search?q=is:pr+author:codegen-sh[bot]&type=pullrequests" target="_blank"
-                    >4,148</a
-                  >
-                  <span>total PRs</span>
+                <div class="metric draft-metric">
+                  <a href="https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:draft&type=pullrequests" target="_blank">
+                    <span class="metric-count">2,085</span>
+                    <span>draft</span>
+                  </a>
                 </div>
                 <div class="metric">
-                  <a href="https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:merged&type=pullrequests" target="_blank"
-                    >1,692</a
-                  >
-                  <span>merged</span>
+                  <a href="https://github.com/search?q=is:pr+author:codegen-sh[bot]+-is:draft&type=pullrequests" target="_blank">
+                    <span class="metric-count">2,089</span>
+                    <span>ready</span>
+                  </a>
+                </div>
+                <div class="metric">
+                  <a href="https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:merged&type=pullrequests" target="_blank">
+                    <span class="metric-count">1,695</span>
+                    <span>merged</span>
+                  </a>
                 </div>
               </div>
             </div>
           <div class="progress-bar">
             <div
               class="progress"
-              style="width: 40.790742526518805%; background-color: #d97706"
+              style="width: 81.13930110100527%; background-color: #d97706"
             ></div>
           </div>
         </div>
         
       </section>
 
+      <!-- Definitions section -->
+      <section class="definitions">
+        <div class="explanation-section">
+          <button class="explanation-toggle" id="explanationToggle">
+            <span class="toggle-text">IMPORTANT DEFINITIONS</span>
+            <span class="toggle-arrow">▼</span>
+          </button>
+          <div class="explanation-content" id="explanationContent">
+            <p>Different AI coding agents follow different workflows when creating pull requests:</p>
+            <ul>
+              <li><strong>All PRs:</strong> Every pull request created by an agent, including DRAFT PRs.</li>
+              <li><strong>Ready PRs:</strong> Non-draft pull requests that are ready for review and merging</li>
+              <li><strong>Merged PRs:</strong> Pull requests that were successfully merged into the codebase</li>
+            </ul>
+            <p><strong>Key workflow differences:</strong> Some agents like <strong>Codex</strong> iterate privately and create ready PRs directly, resulting in very few drafts but high merge rates. Others like <strong>Copilot</strong> and <strong>Codegen</strong> create draft PRs first, encouraging public iteration before marking them ready for review.</p>
+            <p>By default, we show success rates using <strong>Ready PRs only</strong> to fairly compare agents across different workflows. This focuses on each agent's ability to produce mergeable code, regardless of whether they iterate publicly (with drafts) or privately. Toggle to "Include draft PRs" to see the complete picture of all activity.</p>
+          </div>
+        </div>
+      </section>
+
       <!-- Historic Chart -->
       <section class="chart">
-        <h2>PR Volume vs. Success Rate</h2>
+        <h2>PR Volume & Success Rate</h2>
         <div class="chart-controls">
           <div class="control-row">
             <div class="control-section">
@@ -333,6 +432,17 @@
               </div>
             </div>
             <div class="control-section">
+              <span class="control-label">SUCCESS RATE</span>
+              <div class="toggle-buttons">
+                <button id="rateReady" class="rate-btn active" data-rate="ready">
+                  <span class="rate-icon">●</span>Ready PRs Only (M/R)
+                </button>
+                <button id="rateTotal" class="rate-btn" data-rate="total">
+                  All PRs (M/A)
+                </button>
+              </div>
+            </div>
+            <div class="control-section">
               <span class="control-label">VIEW MODE</span>
               <div class="toggle-buttons">
                 <button id="viewAll" class="view-btn active" data-view="all">
@@ -356,8 +466,8 @@
       <!-- Simple Footer -->
       <footer class="footer">
         <p>
-          Updated June 25, 2025 14:18 UTC •
-          <a href="https://github.com/aavetis/ai-pr-watcher">by aavetis</a>
+          Updated June 27, 2025 11:33 UTC •
+          <a href="https://github.com/aavetis/ai-pr-watcher" target="_blank">by aavetis</a>
         </p>
       </footer>
     </div>
@@ -365,26 +475,145 @@
     <script>
       // Chart instance
       let chartInstance = null;
+      let currentRateType = 'ready'; // Track current success rate type
+      let currentChartRateType = 'ready'; // Track current chart success rate type
 
       document.addEventListener("DOMContentLoaded", function () {
         initializeSorting();
+        initializeDropdown();
+        initializeExplanation();
         loadCharts();
-        // Sort by success rate on page load
-        sortAgents("success-rate");
+        // Sort by total PRs on page load
+        sortAgents("total-prs");
       });
 
       // Dynamic Sorting
       function initializeSorting() {
         const sortButtons = document.querySelectorAll(".sort-btn");
         sortButtons.forEach((btn) => {
-          btn.addEventListener("click", () => {
-            // Update active button
-            sortButtons.forEach((b) => b.classList.remove("active"));
-            btn.classList.add("active");
+          if (!btn.classList.contains('dropdown-btn')) {
+            btn.addEventListener("click", () => {
+              // Update active button
+              sortButtons.forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
 
-            // Sort agents
-            sortAgents(btn.dataset.sort);
+              // Sort agents
+              sortAgents(btn.dataset.sort);
+            });
+          }
+        });
+      }
+
+      function initializeDropdown() {
+        const dropdownBtn = document.getElementById('successRateBtn');
+        const dropdown = document.getElementById('successRateDropdown');
+        const dropdownItems = document.querySelectorAll('.dropdown-item');
+        const arrow = dropdownBtn.querySelector('.dropdown-arrow');
+
+        // Toggle dropdown
+        dropdownBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isShowing = dropdown.classList.contains('show');
+          dropdown.classList.toggle('show');
+
+          // Rotate arrow
+          if (dropdown.classList.contains('show')) {
+            arrow.style.transform = 'rotate(180deg)';
+          } else {
+            arrow.style.transform = 'rotate(0deg)';
+          }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+          dropdown.classList.remove('show');
+          arrow.style.transform = 'rotate(0deg)';
+        });
+
+        // Handle dropdown item selection
+        dropdownItems.forEach(item => {
+          item.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            // Update active item
+            dropdownItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            // Update rate type
+            currentRateType = item.dataset.rateType;
+
+            // Update button text to show current mode
+            const modeText = currentRateType === 'ready' ? '(M/R)' : '(M/A)';
+            dropdownBtn.innerHTML = `Success Rate <span class="mode-indicator">${modeText}</span> <span class="dropdown-arrow">▼</span>`;
+
+            // Update all agents' data and resort
+            updateAgentMetrics(currentRateType);
+            sortAgents('success-rate');
+
+            // Close dropdown
+            dropdown.classList.remove('show');
+            arrow.style.transform = 'rotate(0deg)';
+
+            // Make sure success rate button is active
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+            dropdownBtn.classList.add('active');
           });
+        });
+      }
+
+      function initializeExplanation() {
+        const toggle = document.getElementById('explanationToggle');
+        const content = document.getElementById('explanationContent');
+        const arrow = toggle.querySelector('.toggle-arrow');
+
+        toggle.addEventListener('click', () => {
+          const isExpanded = content.classList.contains('expanded');
+
+          if (isExpanded) {
+            content.classList.remove('expanded');
+            toggle.classList.remove('expanded');
+          } else {
+            content.classList.add('expanded');
+            toggle.classList.add('expanded');
+          }
+        });
+      }
+
+      function updateAgentMetrics(rateType) {
+        const agents = document.querySelectorAll('.agent');
+
+        agents.forEach(agent => {
+          const rate = rateType === 'ready'
+            ? parseFloat(agent.dataset.successRateReady)
+            : parseFloat(agent.dataset.successRateTotal);
+
+          // Update the data attribute for sorting
+          agent.dataset.successRate = rate;
+
+          // Update the primary metric display
+          const metricValue = agent.querySelector('.metric-value');
+          metricValue.textContent = rate.toFixed(1) + '%';
+
+          // Update the progress bar
+          const progressBar = agent.querySelector('.progress');
+          progressBar.style.width = rate + '%';
+
+          // Update subtitle to highlight the current mode
+          const subtitle = agent.querySelector('.agent-subtitle');
+          const prCount = subtitle.querySelector('.pr-count');
+          const prType = subtitle.querySelector('.pr-type');
+
+          if (rateType === 'ready') {
+            prCount.textContent = parseInt(agent.dataset.readyPrs).toLocaleString();
+            prType.textContent = 'ready';
+            prType.style.fontWeight = '600';
+            subtitle.querySelector('.pr-total-label').style.opacity = '0.6';
+          } else {
+            prCount.textContent = parseInt(agent.dataset.totalPrs).toLocaleString();
+            prType.textContent = 'all';
+            prType.style.fontWeight = '600';
+            subtitle.querySelector('.pr-total-label').style.opacity = '1';
+          }
         });
       }
 
@@ -591,55 +820,85 @@
 
         // Set up toggle functionality
         setupToggleButtons();
+
+        // Initialize chart with proper dataset visibility
+        updateChartVisibility();
+      }
+
+      function updateChartVisibility() {
+        if (!chartInstance) return;
+
+        chartInstance.data.datasets.forEach((dataset) => {
+          const isLine = dataset.type === "line";
+          const isBar = dataset.type === "bar";
+          const labelLower = dataset.label.toLowerCase();
+
+          // Get the agent name from the dataset label
+          const agentMatch = labelLower.match(/(copilot|codex|cursor|devin|codegen)/);
+          const agent = agentMatch ? agentMatch[1] : null;
+
+          // Check if agent is currently enabled
+          const agentButton = document.querySelector(`.toggle-btn[data-agent="${agent}"]`);
+          const agentEnabled = agentButton && agentButton.classList.contains("active");
+
+          // Check current view mode
+          const activeViewBtn = document.querySelector(".view-btn.active");
+          const currentView = activeViewBtn ? activeViewBtn.dataset.view : "all";
+
+          // For lines, check rate type
+          const isCorrectRateType = isLine ?
+            (currentChartRateType === 'ready' ? labelLower.includes('ready') : labelLower.includes('all')) :
+            true;
+
+          // Set visibility based on all conditions
+          switch (currentView) {
+            case "all":
+              dataset.hidden = !agentEnabled || (isLine && !isCorrectRateType);
+              break;
+            case "bars":
+              dataset.hidden = !agentEnabled || isLine;
+              break;
+            case "lines":
+              dataset.hidden = !agentEnabled || isBar || (isLine && !isCorrectRateType);
+              break;
+          }
+        });
+
+        chartInstance.update();
       }
 
       function setupToggleButtons() {
         const toggleButtons = document.querySelectorAll(".toggle-btn");
         const viewButtons = document.querySelectorAll(".view-btn");
+        const rateButtons = document.querySelectorAll(".rate-btn");
 
         // Agent toggle functionality
         toggleButtons.forEach((button) => {
           button.addEventListener("click", function () {
             const agent = this.dataset.agent;
-            const isActive = this.classList.contains("active");
 
             // Toggle button state
             this.classList.toggle("active");
 
-            // Get current view mode
-            const activeViewBtn = document.querySelector(".view-btn.active");
-            const currentView = activeViewBtn
-              ? activeViewBtn.dataset.view
-              : "all";
+            // Update chart visibility
+            updateChartVisibility();
+          });
+        });
 
-            // Find and toggle datasets for this agent
-            chartInstance.data.datasets.forEach((dataset, index) => {
-              const labelLower = dataset.label.toLowerCase();
-              if (labelLower.includes(agent)) {
-                const isLine = dataset.type === "line";
-                const isBar = dataset.type === "bar";
+        // Success rate type functionality
+        rateButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const rateType = this.dataset.rate;
 
-                if (isActive) {
-                  // Was active, now hiding
-                  dataset.hidden = true;
-                } else {
-                  // Was hidden, now showing (but respect view mode)
-                  switch (currentView) {
-                    case "all":
-                      dataset.hidden = false;
-                      break;
-                    case "bars":
-                      dataset.hidden = isLine;
-                      break;
-                    case "lines":
-                      dataset.hidden = isBar;
-                      break;
-                  }
-                }
-              }
-            });
+            // Update button states
+            rateButtons.forEach((btn) => btn.classList.remove("active"));
+            this.classList.add("active");
 
-            chartInstance.update();
+            // Update current rate type
+            currentChartRateType = rateType;
+
+            // Update chart visibility
+            updateChartVisibility();
           });
         });
 
@@ -652,38 +911,8 @@
             viewButtons.forEach((btn) => btn.classList.remove("active"));
             this.classList.add("active");
 
-            // Show/hide datasets based on view mode and agent toggles
-            chartInstance.data.datasets.forEach((dataset) => {
-              const isLine = dataset.type === "line";
-              const isBar = dataset.type === "bar";
-
-              // Get the agent name from the dataset label
-              const agentMatch = dataset.label
-                .toLowerCase()
-                .match(/(copilot|codex|cursor|devin|codegen)/);
-              const agent = agentMatch ? agentMatch[1] : null;
-
-              // Check if agent is currently enabled
-              const agentButton = document.querySelector(
-                `.toggle-btn[data-agent="${agent}"]`
-              );
-              const agentEnabled =
-                agentButton && agentButton.classList.contains("active");
-
-              switch (view) {
-                case "all":
-                  dataset.hidden = !agentEnabled;
-                  break;
-                case "bars":
-                  dataset.hidden = !agentEnabled || isLine;
-                  break;
-                case "lines":
-                  dataset.hidden = !agentEnabled || isBar;
-                  break;
-              }
-            });
-
-            chartInstance.update();
+            // Update chart visibility
+            updateChartVisibility();
           });
         });
       }

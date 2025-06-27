@@ -38,15 +38,15 @@
           <h2>Leaderboard</h2>
           <div class="sort-controls">
             <div class="dropdown-container">
-              <button class="sort-btn dropdown-btn active" data-sort="success-rate" id="successRateBtn">
-                Success Rate <span class="mode-indicator">w/o drafts</span> <span class="dropdown-arrow">▼</span>
+              <button class="sort-btn dropdown-btn" data-sort="success-rate" id="successRateBtn">
+                Success Rate <span class="mode-indicator">(M/R)</span> <span class="dropdown-arrow">▼</span>
               </button>
               <div class="dropdown-menu" id="successRateDropdown">
-                <button class="dropdown-item active" data-rate-type="ready">Ready PRs only</button>
-                <button class="dropdown-item" data-rate-type="total">Include draft PRs</button>
+                <button class="dropdown-item active" data-rate-type="ready">Merged/Ready PRs</button>
+                <button class="dropdown-item" data-rate-type="total">Merged/All PRs, including drafts</button>
               </div>
             </div>
-            <button class="sort-btn" data-sort="total-prs">Total PRs</button>
+            <button class="sort-btn active" data-sort="total-prs">Total PRs</button>
             <button class="sort-btn" data-sort="merged-prs">Merged PRs</button>
           </div>
         </div>
@@ -82,21 +82,23 @@
                 <span class="metric-label">Success Rate</span>
               </div>
               <div class="secondary-metrics">
-                <div class="metric">
-                  <a href="{{ agent.total_query_url }}" target="_blank"
-                    ><span class="metric-count">{{ stats[agent.key].total | comma }}</span></a
-                  >
-                  <span>all PRs</span>
+                <div class="metric draft-metric">
+                  <a href="{{ agent.draft_query_url }}" target="_blank">
+                    <span class="metric-count">{{ (stats[agent.key].total - stats[agent.key].nondraft) | comma }}</span>
+                    <span>draft</span>
+                  </a>
                 </div>
                 <div class="metric">
-                  <span class="metric-count">{{ stats[agent.key].nondraft | comma }}</span>
-                  <span>ready</span>
+                  <a href="{{ agent.ready_query_url }}" target="_blank">
+                    <span class="metric-count">{{ stats[agent.key].nondraft | comma }}</span>
+                    <span>ready</span>
+                  </a>
                 </div>
                 <div class="metric">
-                  <a href="{{ agent.merged_query_url }}" target="_blank"
-                    ><span class="metric-count">{{ stats[agent.key].merged | comma }}</span></a
-                  >
-                  <span>merged</span>
+                  <a href="{{ agent.merged_query_url }}" target="_blank">
+                    <span class="metric-count">{{ stats[agent.key].merged | comma }}</span>
+                    <span>merged</span>
+                  </a>
                 </div>
               </div>
             </div>
@@ -114,7 +116,7 @@
       <section class="definitions">
         <div class="explanation-section">
           <button class="explanation-toggle" id="explanationToggle">
-            <span class="toggle-text">Definitions</span>
+            <span class="toggle-text">IMPORTANT DEFINITIONS</span>
             <span class="toggle-arrow">▼</span>
           </button>
           <div class="explanation-content" id="explanationContent">
@@ -132,7 +134,7 @@
 
       <!-- Historic Chart -->
       <section class="chart">
-        <h2>PR Volume vs. Success Rate</h2>
+        <h2>PR Volume & Success Rate</h2>
         <div class="chart-controls">
           <div class="control-row">
             <div class="control-section">
@@ -151,6 +153,17 @@
                   >{{ agent.long_name }}
                 </button>
                 {% endfor %}
+              </div>
+            </div>
+            <div class="control-section">
+              <span class="control-label">SUCCESS RATE</span>
+              <div class="toggle-buttons">
+                <button id="rateReady" class="rate-btn active" data-rate="ready">
+                  <span class="rate-icon">●</span>Ready PRs Only (M/R)
+                </button>
+                <button id="rateTotal" class="rate-btn" data-rate="total">
+                  All PRs (M/A)
+                </button>
               </div>
             </div>
             <div class="control-section">
@@ -187,14 +200,15 @@
       // Chart instance
       let chartInstance = null;
       let currentRateType = 'ready'; // Track current success rate type
+      let currentChartRateType = 'ready'; // Track current chart success rate type
 
       document.addEventListener("DOMContentLoaded", function () {
         initializeSorting();
         initializeDropdown();
         initializeExplanation();
         loadCharts();
-        // Sort by success rate on page load
-        sortAgents("success-rate");
+        // Sort by total PRs on page load
+        sortAgents("total-prs");
       });
 
       // Dynamic Sorting
@@ -253,7 +267,7 @@
             currentRateType = item.dataset.rateType;
 
             // Update button text to show current mode
-            const modeText = currentRateType === 'ready' ? 'w/o drafts' : 'w/ drafts';
+            const modeText = currentRateType === 'ready' ? '(M/R)' : '(M/A)';
             dropdownBtn.innerHTML = `Success Rate <span class="mode-indicator">${modeText}</span> <span class="dropdown-arrow">▼</span>`;
 
             // Update all agents' data and resort
@@ -530,55 +544,85 @@
 
         // Set up toggle functionality
         setupToggleButtons();
+
+        // Initialize chart with proper dataset visibility
+        updateChartVisibility();
+      }
+
+      function updateChartVisibility() {
+        if (!chartInstance) return;
+
+        chartInstance.data.datasets.forEach((dataset) => {
+          const isLine = dataset.type === "line";
+          const isBar = dataset.type === "bar";
+          const labelLower = dataset.label.toLowerCase();
+
+          // Get the agent name from the dataset label
+          const agentMatch = labelLower.match(/(copilot|codex|cursor|devin|codegen)/);
+          const agent = agentMatch ? agentMatch[1] : null;
+
+          // Check if agent is currently enabled
+          const agentButton = document.querySelector(`.toggle-btn[data-agent="${agent}"]`);
+          const agentEnabled = agentButton && agentButton.classList.contains("active");
+
+          // Check current view mode
+          const activeViewBtn = document.querySelector(".view-btn.active");
+          const currentView = activeViewBtn ? activeViewBtn.dataset.view : "all";
+
+          // For lines, check rate type
+          const isCorrectRateType = isLine ?
+            (currentChartRateType === 'ready' ? labelLower.includes('ready') : labelLower.includes('all')) :
+            true;
+
+          // Set visibility based on all conditions
+          switch (currentView) {
+            case "all":
+              dataset.hidden = !agentEnabled || (isLine && !isCorrectRateType);
+              break;
+            case "bars":
+              dataset.hidden = !agentEnabled || isLine;
+              break;
+            case "lines":
+              dataset.hidden = !agentEnabled || isBar || (isLine && !isCorrectRateType);
+              break;
+          }
+        });
+
+        chartInstance.update();
       }
 
       function setupToggleButtons() {
         const toggleButtons = document.querySelectorAll(".toggle-btn");
         const viewButtons = document.querySelectorAll(".view-btn");
+        const rateButtons = document.querySelectorAll(".rate-btn");
 
         // Agent toggle functionality
         toggleButtons.forEach((button) => {
           button.addEventListener("click", function () {
             const agent = this.dataset.agent;
-            const isActive = this.classList.contains("active");
 
             // Toggle button state
             this.classList.toggle("active");
 
-            // Get current view mode
-            const activeViewBtn = document.querySelector(".view-btn.active");
-            const currentView = activeViewBtn
-              ? activeViewBtn.dataset.view
-              : "all";
+            // Update chart visibility
+            updateChartVisibility();
+          });
+        });
 
-            // Find and toggle datasets for this agent
-            chartInstance.data.datasets.forEach((dataset, index) => {
-              const labelLower = dataset.label.toLowerCase();
-              if (labelLower.includes(agent)) {
-                const isLine = dataset.type === "line";
-                const isBar = dataset.type === "bar";
+        // Success rate type functionality
+        rateButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const rateType = this.dataset.rate;
 
-                if (isActive) {
-                  // Was active, now hiding
-                  dataset.hidden = true;
-                } else {
-                  // Was hidden, now showing (but respect view mode)
-                  switch (currentView) {
-                    case "all":
-                      dataset.hidden = false;
-                      break;
-                    case "bars":
-                      dataset.hidden = isLine;
-                      break;
-                    case "lines":
-                      dataset.hidden = isBar;
-                      break;
-                  }
-                }
-              }
-            });
+            // Update button states
+            rateButtons.forEach((btn) => btn.classList.remove("active"));
+            this.classList.add("active");
 
-            chartInstance.update();
+            // Update current rate type
+            currentChartRateType = rateType;
+
+            // Update chart visibility
+            updateChartVisibility();
           });
         });
 
@@ -591,38 +635,8 @@
             viewButtons.forEach((btn) => btn.classList.remove("active"));
             this.classList.add("active");
 
-            // Show/hide datasets based on view mode and agent toggles
-            chartInstance.data.datasets.forEach((dataset) => {
-              const isLine = dataset.type === "line";
-              const isBar = dataset.type === "bar";
-
-              // Get the agent name from the dataset label
-              const agentMatch = dataset.label
-                .toLowerCase()
-                .match(/(copilot|codex|cursor|devin|codegen)/);
-              const agent = agentMatch ? agentMatch[1] : null;
-
-              // Check if agent is currently enabled
-              const agentButton = document.querySelector(
-                `.toggle-btn[data-agent="${agent}"]`
-              );
-              const agentEnabled =
-                agentButton && agentButton.classList.contains("active");
-
-              switch (view) {
-                case "all":
-                  dataset.hidden = !agentEnabled;
-                  break;
-                case "bars":
-                  dataset.hidden = !agentEnabled || isLine;
-                  break;
-                case "lines":
-                  dataset.hidden = !agentEnabled || isBar;
-                  break;
-              }
-            });
-
-            chartInstance.update();
+            // Update chart visibility
+            updateChartVisibility();
           });
         });
       }

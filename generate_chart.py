@@ -28,6 +28,8 @@ AGENTS = [
         "info_url": "https://docs.github.com/en/copilot/using-github-copilot/coding-agent/using-copilot-to-work-on-an-issue",
         "total_query_url": "https://github.com/search?q=is:pr+head:copilot/&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+head:copilot/+is:merged&type=pullrequests",
+        "ready_query_url": "https://github.com/search?q=is:pr+head:copilot/+-is:draft&type=pullrequests",
+        "draft_query_url": "https://github.com/search?q=is:pr+head:copilot/+is:draft&type=pullrequests",
     },
     {
         "key": "codex",
@@ -37,6 +39,8 @@ AGENTS = [
         "info_url": "https://openai.com/index/introducing-codex/",
         "total_query_url": "https://github.com/search?q=is:pr+head:codex/&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+head:codex/+is:merged&type=pullrequests",
+        "ready_query_url": "https://github.com/search?q=is:pr+head:codex/+-is:draft&type=pullrequests",
+        "draft_query_url": "https://github.com/search?q=is:pr+head:codex/+is:draft&type=pullrequests",
     },
     {
         "key": "cursor",
@@ -46,6 +50,8 @@ AGENTS = [
         "info_url": "https://docs.cursor.com/background-agent",
         "total_query_url": "https://github.com/search?q=is:pr+head:cursor/&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests",
+        "ready_query_url": "https://github.com/search?q=is:pr+head:cursor/+-is:draft&type=pullrequests",
+        "draft_query_url": "https://github.com/search?q=is:pr+head:cursor/+is:draft&type=pullrequests",
     },
     {
         "key": "devin",
@@ -55,6 +61,8 @@ AGENTS = [
         "info_url": "https://devin.ai/pricing",
         "total_query_url": "https://github.com/search?q=is:pr+author:devin-ai-integration[bot]&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+author:devin-ai-integration[bot]+is:merged&type=pullrequests",
+        "ready_query_url": "https://github.com/search?q=is:pr+author:devin-ai-integration[bot]+-is:draft&type=pullrequests",
+        "draft_query_url": "https://github.com/search?q=is:pr+author:devin-ai-integration[bot]+is:draft&type=pullrequests",
     },
     {
         "key": "codegen",
@@ -64,6 +72,8 @@ AGENTS = [
         "info_url": "https://codegen.com/",
         "total_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:merged&type=pullrequests",
+        "ready_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]+-is:draft&type=pullrequests",
+        "draft_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:draft&type=pullrequests",
     },
 ]
 
@@ -127,8 +137,51 @@ def generate_chart(csv_file=None):
             f"Limited chart to 8 data points evenly distributed across {total_points} total points."
         )
 
-    # Calculate percentages with safety checks
+    # Calculate percentages with safety checks - both ready and total rates
+    # Ready rate (merged/nondraft) - default for chart display
     df["copilot_percentage"] = df.apply(
+        lambda row: (
+            (row["copilot_merged"] / row["copilot_nondraft"] * 100)
+            if row["copilot_nondraft"] > 0
+            else 0
+        ),
+        axis=1,
+    )
+    df["codex_percentage"] = df.apply(
+        lambda row: (
+            (row["codex_merged"] / row["codex_nondraft"] * 100)
+            if row["codex_nondraft"] > 0
+            else 0
+        ),
+        axis=1,
+    )
+    df["cursor_percentage"] = df.apply(
+        lambda row: (
+            (row["cursor_merged"] / row["cursor_nondraft"] * 100)
+            if row["cursor_nondraft"] > 0
+            else 0
+        ),
+        axis=1,
+    )
+    df["devin_percentage"] = df.apply(
+        lambda row: (
+            (row["devin_merged"] / row["devin_nondraft"] * 100)
+            if row["devin_nondraft"] > 0
+            else 0
+        ),
+        axis=1,
+    )
+    df["codegen_percentage"] = df.apply(
+        lambda row: (
+            (row["codegen_merged"] / row["codegen_nondraft"] * 100)
+            if row["codegen_nondraft"] > 0
+            else 0
+        ),
+        axis=1,
+    )
+
+    # Total rate (merged/total) - for alternative view
+    df["copilot_total_percentage"] = df.apply(
         lambda row: (
             (row["copilot_merged"] / row["copilot_total"] * 100)
             if row["copilot_total"] > 0
@@ -136,7 +189,7 @@ def generate_chart(csv_file=None):
         ),
         axis=1,
     )
-    df["codex_percentage"] = df.apply(
+    df["codex_total_percentage"] = df.apply(
         lambda row: (
             (row["codex_merged"] / row["codex_total"] * 100)
             if row["codex_total"] > 0
@@ -144,7 +197,7 @@ def generate_chart(csv_file=None):
         ),
         axis=1,
     )
-    df["cursor_percentage"] = df.apply(
+    df["cursor_total_percentage"] = df.apply(
         lambda row: (
             (row["cursor_merged"] / row["cursor_total"] * 100)
             if row["cursor_total"] > 0
@@ -152,7 +205,7 @@ def generate_chart(csv_file=None):
         ),
         axis=1,
     )
-    df["devin_percentage"] = df.apply(
+    df["devin_total_percentage"] = df.apply(
         lambda row: (
             (row["devin_merged"] / row["devin_total"] * 100)
             if row["devin_total"] > 0
@@ -160,7 +213,7 @@ def generate_chart(csv_file=None):
         ),
         axis=1,
     )
-    df["codegen_percentage"] = df.apply(
+    df["codegen_total_percentage"] = df.apply(
         lambda row: (
             (row["codegen_merged"] / row["codegen_total"] * 100)
             if row["codegen_total"] > 0
@@ -530,7 +583,8 @@ def export_chart_data_json(df):
         # Process data to replace leading zeros with None (null in JSON)
         total_data = df[f"{agent}_total"].tolist()
         merged_data = df[f"{agent}_merged"].tolist()
-        percentage_data = df[f"{agent}_percentage"].tolist()
+        ready_percentage_data = df[f"{agent}_percentage"].tolist()  # ready rate
+        total_percentage_data = df[f"{agent}_total_percentage"].tolist()  # total rate
 
         # Find first non-zero total value index
         first_nonzero_idx = None
@@ -544,7 +598,8 @@ def export_chart_data_json(df):
             for i in range(first_nonzero_idx):
                 total_data[i] = None
                 merged_data[i] = None
-                percentage_data[i] = None
+                ready_percentage_data[i] = None
+                total_percentage_data[i] = None
 
         # Total PRs
         chart_data["datasets"].append(
@@ -574,12 +629,12 @@ def export_chart_data_json(df):
             }
         )
 
-        # Success rate line
+        # Success rate line (ready PRs) - shown by default
         chart_data["datasets"].append(
             {
-                "label": f"{agent.title()} Success %",
+                "label": f"{agent.title()} Success % (Ready)",
                 "type": "line",
-                "data": percentage_data,
+                "data": ready_percentage_data,
                 "borderColor": colors[agent]["line"],
                 "backgroundColor": "rgba(255, 255, 255, 0.8)",
                 "borderWidth": 3,
@@ -588,6 +643,26 @@ def export_chart_data_json(df):
                 "fill": False,
                 "yAxisID": "y1",
                 "order": 1,
+                "rateType": "ready",
+            }
+        )
+
+        # Success rate line (all PRs) - hidden by default
+        chart_data["datasets"].append(
+            {
+                "label": f"{agent.title()} Success % (All)",
+                "type": "line",
+                "data": total_percentage_data,
+                "borderColor": colors[agent]["line"],
+                "backgroundColor": "rgba(255, 255, 255, 0.8)",
+                "borderWidth": 3,
+                "pointRadius": 3,
+                "pointHoverRadius": 5,
+                "fill": False,
+                "yAxisID": "y1",
+                "order": 1,
+                "hidden": True,  # Hidden by default
+                "rateType": "total",
             }
         )
 

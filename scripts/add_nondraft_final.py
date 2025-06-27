@@ -1,26 +1,34 @@
 #!/usr/bin/env python3
 """
-Add non-draft PR data to existing data.csv - Single optimized script.
+ONE-TIME SCRIPT: Add non-draft PR data to existing data.csv
+Used to retroactively add nondraft columns to historical data by querying GitHub API.
 This script strategically samples data points and handles GitHub API limitations properly.
+Completed: Added non-draft tracking for all agents in the dataset.
 """
 
 import csv
 import datetime as dt
 import time
+import os
 from pathlib import Path
 import requests
 from typing import Dict
 
-# GitHub API headers
+# GitHub API headers - include PAT if available
 HEADERS = {"Accept": "application/vnd.github+json", "User-Agent": "PR-Watcher"}
+if github_token := os.getenv("GITHUB_TOKEN"):
+    HEADERS["Authorization"] = f"token {github_token}"
+    print("✅ Using GitHub PAT for authentication")
+else:
+    print("⚠️  No GitHub PAT found, using unauthenticated requests")
 
 # Non-draft queries (excluding drafts with -is:draft)
 NONDRAFT_QUERIES = {
     "is:pr+head:copilot/+-is:draft": "copilot_nondraft",
     "is:pr+head:codex/+-is:draft": "codex_nondraft",
     "is:pr+head:cursor/+-is:draft": "cursor_nondraft",
-    "author:devin-ai-integration[bot]+-is:draft": "devin_nondraft",
-    "author:codegen-sh[bot]+-is:draft": "codegen_nondraft",
+    "is:pr+author:devin-ai-integration[bot]+-is:draft": "devin_nondraft",
+    "is:pr+author:codegen-sh[bot]+-is:draft": "codegen_nondraft",
 }
 
 
@@ -76,7 +84,7 @@ def get_nondraft_counts_at_time(timestamp: dt.datetime) -> Dict[str, int]:
                 )
 
                 if r.status_code == 403:
-                    wait_time = 60 * (2**attempt)  # 60s, 120s, 240s
+                    wait_time = 10 * (2**attempt)  # 10s, 20s, 40s
                     print(f"    Rate limited, waiting {wait_time}s...")
                     time.sleep(wait_time)
                     continue
@@ -98,27 +106,35 @@ def get_nondraft_counts_at_time(timestamp: dt.datetime) -> Dict[str, int]:
                 else:
                     print(f"    Retry {attempt + 1} for {key}")
 
-        # Rate limiting: wait between queries
-        time.sleep(3)
+        # No rate limiting needed with PAT (5000 requests/hour)
+        time.sleep(0.1)  # Just a tiny delay to be safe
 
     return counts
 
 
-def interpolate_linear(
-    start_val: int,
-    end_val: int,
-    start_time: dt.datetime,
-    end_time: dt.datetime,
-    target_time: dt.datetime,
-) -> int:
-    """Linear interpolation between two data points."""
-    if start_time == end_time:
-        return start_val
+def enforce_constraints(row: dict) -> dict:
+    """Enforce logical constraints: merged <= nondraft <= total for each agent."""
+    agents = ["copilot", "codex", "cursor", "devin", "codegen"]
 
-    ratio = (target_time - start_time).total_seconds() / (
-        end_time - start_time
-    ).total_seconds()
-    return round(start_val + (end_val - start_val) * ratio)
+    for agent in agents:
+        total_key = f"{agent}_total"
+        merged_key = f"{agent}_merged"
+        nondraft_key = f"{agent}_nondraft"
+
+        if all(key in row for key in [total_key, merged_key, nondraft_key]):
+            total = int(row[total_key])
+            merged = int(row[merged_key])
+            nondraft = int(row[nondraft_key])
+
+            # Enforce constraints: merged <= nondraft <= total
+            # Start from the bottom and work up
+            nondraft = max(
+                merged, min(nondraft, total)
+            )  # nondraft between merged and total
+
+            row[nondraft_key] = nondraft
+
+    return row
 
 
 def main():
@@ -153,48 +169,22 @@ def main():
     total_rows = len(rows)
     print(f"📊 Found {total_rows} rows")
 
-    # New fieldnames with non-draft columns
-    new_fieldnames = fieldnames + list(NONDRAFT_QUERIES.values())
+    # New fieldnames with non-draft columns (only add if not already present)
+    nondraft_columns = list(NONDRAFT_QUERIES.values())
+    missing_columns = [col for col in nondraft_columns if col not in fieldnames]
+    new_fieldnames = fieldnames + missing_columns
 
-    # Strategic sampling: first, last, and every 20 rows
-    sample_indices = [0]  # Always include first
-    for i in range(20, total_rows, 20):
-        sample_indices.append(i)
-    if (total_rows - 1) not in sample_indices:
-        sample_indices.append(total_rows - 1)  # Always include last
+    if missing_columns:
+        print(f"📋 Adding columns: {missing_columns}")
+    else:
+        print("📋 All nondraft columns already present")
 
-    print(f"🎯 Sampling {len(sample_indices)} points: {sample_indices}")
+    print(f"🎯 Getting exact data for all {total_rows} timestamps")
+    print("📡 This will query GitHub API for each timestamp - may take a while")
 
-    # Get sample data
-    sample_data = {}
-    for i, idx in enumerate(sample_indices):
-        row = rows[idx]
-        timestamp = parse_timestamp(row["timestamp"])
-
-        print(
-            f"\n📡 Sample {i+1}/{len(sample_indices)}: Row {idx+1} ({row['timestamp']})"
-        )
-
-        try:
-            counts = get_nondraft_counts_at_time(timestamp)
-            sample_data[idx] = {"timestamp": timestamp, "counts": counts}
-            print(f"✅ Sample complete")
-        except Exception as e:
-            print(f"❌ Sample failed: {e}")
-            sample_data[idx] = {
-                "timestamp": timestamp,
-                "counts": {key: 0 for key in NONDRAFT_QUERIES.values()},
-            }
-
-        # Wait between samples
-        if i < len(sample_indices) - 1:
-            print("⏱️  Waiting 10 seconds...")
-            time.sleep(10)
-
-    print(f"\n💾 Writing updated data back to {input_file}")
-
-    # Process all rows with interpolation
-    with input_file.open("w", newline="") as f:
+    # Process all rows with exact data - write to temp file first
+    temp_file = input_file.with_suffix(".tmp")
+    with temp_file.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=new_fieldnames)
         writer.writeheader()
 
@@ -202,35 +192,34 @@ def main():
             row = rows[idx].copy()
             timestamp = parse_timestamp(row["timestamp"])
 
-            if idx in sample_data:
-                # Use actual sample data
-                row.update(sample_data[idx]["counts"])
-            else:
-                # Interpolate between nearest samples
-                prev_idx = max([i for i in sample_indices if i < idx])
-                next_idx = min([i for i in sample_indices if i > idx])
+            print(f"\n📡 Row {idx+1}/{total_rows}: {row['timestamp']}")
 
-                prev_data = sample_data[prev_idx]
-                next_data = sample_data[next_idx]
+            try:
+                counts = get_nondraft_counts_at_time(timestamp)
+                row.update(counts)
 
-                # Interpolate each metric
+                # Enforce constraints to ensure data integrity
+                row = enforce_constraints(row)
+
+                print(f"✅ Data retrieved and validated")
+            except Exception as e:
+                print(f"❌ Failed: {e}")
+                # Use zeros for failed queries
                 for key in NONDRAFT_QUERIES.values():
-                    interpolated = interpolate_linear(
-                        prev_data["counts"][key],
-                        next_data["counts"][key],
-                        prev_data["timestamp"],
-                        next_data["timestamp"],
-                        timestamp,
-                    )
-                    row[key] = interpolated
+                    row[key] = 0
 
             writer.writerow(row)
 
-            if (idx + 1) % 50 == 0:
-                print(f"  📝 Processed {idx + 1}/{total_rows} rows")
+            # No rate limiting needed between rows with PAT
+            if idx < total_rows - 1:
+                print("⏱️  Brief pause...")
+                time.sleep(0.2)
 
-    print(f"\n✅ Complete! Updated {input_file} with non-draft data")
-    print(f"📈 Added non-draft columns using {len(sample_indices)} API samples")
+    # Replace original file with temp file
+    temp_file.replace(input_file)
+
+    print(f"\n✅ Complete! Updated {input_file} with exact non-draft data")
+    print(f"📈 Queried {total_rows} exact timestamps")
     print(f"💾 Original data backed up to {backup_file}")
 
     # Show sample of results
@@ -246,9 +235,7 @@ def main():
 
 if __name__ == "__main__":
     print("🚀 Adding non-draft PR data to data.csv")
-    print(
-        "This uses strategic sampling to minimize API calls while maintaining accuracy."
-    )
+    print("This will query GitHub API for exact data at each timestamp.")
 
     response = input("\nContinue? (y/N): ")
     if response.lower() == "y":
