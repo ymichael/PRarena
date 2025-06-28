@@ -48,8 +48,8 @@ Explore the GitHub search queries used:
 
 | Project | Ready PRs | Merged PRs | Success Rate |
 | ------- | --------- | ---------- | ------------ |
-| Copilot | 12,916 | 11,937 | 92.42% |
-| Codex | 515,722 | 450,095 | 87.27% |
-| Cursor | 2,763 | 2,095 | 75.82% |
-| Devin | 28,405 | 18,649 | 65.65% |
+| Copilot | 12,940 | 11,956 | 92.4% |
+| Codex | 517,116 | 451,318 | 87.28% |
+| Cursor | 2,771 | 2,096 | 75.64% |
+| Devin | 28,385 | 18,631 | 65.64% |
 | Codegen | 2,096 | 1,699 | 81.06% |
