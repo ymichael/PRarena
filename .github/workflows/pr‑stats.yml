@@ -22,7 +22,7 @@ jobs:
       - name: Collect PR data
         run: python collect_data.py
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.USER_PAT }}
 
       - name: Generate chart
         run: python generate_chart.py
