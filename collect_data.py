@@ -15,11 +15,9 @@ def get_headers():
     github_token = os.getenv("GITHUB_TOKEN")
     if github_token:
         headers["Authorization"] = f"token {github_token}"
-        print("✅ Using authenticated GitHub API requests")
-        # Don't print the full token for security, just confirm it exists
-        print(f"   Token format: {github_token[:4]}...{github_token[-4:] if len(github_token) > 8 else '***'}")
+        print("Using authenticated GitHub API requests")
     else:
-        print("⚠️  Using unauthenticated GitHub API requests (rate limited)")
+        print("Using unauthenticated GitHub API requests (rate limited)")
 
     return headers
 
@@ -61,7 +59,7 @@ def collect_data():
     for query, key in Q.items():
         print(f"Collecting {key}...")
         
-        # Retry logic for rate limiting and temporary failures
+        # Simple retry logic - 3 attempts with pause
         max_attempts = 3
         for attempt in range(max_attempts):
             try:
@@ -70,58 +68,20 @@ def collect_data():
                     headers=headers,
                     timeout=30,
                 )
-                
-                if r.status_code == 403:
-                    # Provide more detailed error information
-                    response_text = r.text[:500] if r.text else "No response text"
-                    rate_limit_headers = {k: v for k, v in r.headers.items() if 'rate' in k.lower() or 'limit' in k.lower()}
-                    
-                    if "rate limit" in response_text.lower() or "API rate limit" in response_text.lower() or rate_limit_headers:
-                        wait_time = 10 * (2 ** attempt)  # 10s, 20s, 40s
-                        print(f"    Rate limited (attempt {attempt + 1}/{max_attempts}), waiting {wait_time}s...")
-                        if rate_limit_headers:
-                            print(f"    Rate limit headers: {rate_limit_headers}")
-                        if attempt < max_attempts - 1:  # Don't wait on last attempt
-                            time.sleep(wait_time)
-                        continue
-                    else:
-                        print(f"    403 Forbidden (not rate limit): {response_text}")
-                        print(f"    Request URL: https://api.github.com/search/issues?q={query}")
-                        break
-                elif r.status_code == 422:
-                    print(f"    Query syntax error for {key}, skipping")
-                    cnt[key] = 0
-                    break
-                
                 r.raise_for_status()
                 cnt[key] = r.json()["total_count"]
                 print(f"  {key}: {cnt[key]}")
                 break
                 
             except Exception as e:
-                if attempt == max_attempts - 1:  # Last attempt
-                    print(f"    ✗ Failed {key} after {max_attempts} attempts: {e}")
-                    cnt[key] = 0
+                if attempt == max_attempts - 1:  # Last attempt - fail the job
+                    raise e
                 else:
-                    print(f"    Retry {attempt + 1} for {key} due to: {e}")
-                    time.sleep(5)  # Short delay before retry
+                    print(f"    Attempt {attempt + 1} failed, retrying...")
+                    time.sleep(10)  # Wait 10 seconds before retry
 
-        # Rate limiting: longer delay between API calls to be safe
+        # Rate limiting: wait between API calls
         time.sleep(1.0)
-
-    # Ensure we have all expected keys, even if some requests failed
-    expected_keys = [
-        "copilot_total", "copilot_merged", "copilot_nondraft",
-        "codex_total", "codex_merged", "codex_nondraft", 
-        "cursor_total", "cursor_merged", "cursor_nondraft",
-        "devin_total", "devin_merged", "devin_nondraft",
-        "codegen_total", "codegen_merged", "codegen_nondraft"
-    ]
-    
-    for key in expected_keys:
-        if key not in cnt:
-            cnt[key] = 0
-            print(f"⚠️  Missing data for {key}, using 0")
 
     # Save data to CSV
     timestamp = dt.datetime.now(dt.UTC).strftime("%Y‑%m‑%d %H:%M:%S")
