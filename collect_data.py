@@ -14,7 +14,7 @@ def get_headers():
     # Add authentication if token is available
     github_token = os.getenv("GITHUB_TOKEN")
     if github_token:
-        headers["Authorization"] = f"Bearer {github_token}"
+        headers["Authorization"] = f"token {github_token}"
         print("Using authenticated GitHub API requests")
     else:
         print("Using unauthenticated GitHub API requests (rate limited)")
@@ -58,17 +58,30 @@ def collect_data():
     # Collect all metrics in one loop
     for query, key in Q.items():
         print(f"Collecting {key}...")
-        r = requests.get(
-            f"https://api.github.com/search/issues?q={query}",
-            headers=headers,
-            timeout=30,
-        )
-        r.raise_for_status()
-        cnt[key] = r.json()["total_count"]
-        print(f"  {key}: {cnt[key]}")
+        
+        # Simple retry logic - 3 attempts with pause
+        max_attempts = 3
+        for attempt in range(max_attempts):
+            try:
+                r = requests.get(
+                    f"https://api.github.com/search/issues?q={query}",
+                    headers=headers,
+                    timeout=30,
+                )
+                r.raise_for_status()
+                cnt[key] = r.json()["total_count"]
+                print(f"  {key}: {cnt[key]}")
+                break
+                
+            except Exception as e:
+                if attempt == max_attempts - 1:  # Last attempt - fail the job
+                    raise e
+                else:
+                    print(f"    Attempt {attempt + 1} failed, retrying...")
+                    time.sleep(10)  # Wait 10 seconds before retry
 
-        # Rate limiting: wait half a second between API calls
-        time.sleep(0.5)
+        # Rate limiting: wait between API calls
+        time.sleep(1.0)
 
     # Save data to CSV
     timestamp = dt.datetime.now(dt.UTC).strftime("%Y‑%m‑%d %H:%M:%S")
