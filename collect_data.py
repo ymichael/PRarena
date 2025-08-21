@@ -8,7 +8,7 @@ import time
 
 
 # Delay between API requests to respect rate limits
-API_DELAY_SECONDS = float(os.getenv("API_DELAY_SECONDS", 2))
+API_DELAY_SECONDS = float(os.getenv("API_DELAY_SECONDS", 6))
 
 
 # GitHub API headers with optional authentication
