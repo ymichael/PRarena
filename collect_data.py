@@ -7,6 +7,10 @@ import requests
 import time
 
 
+# Delay between API requests to respect rate limits
+API_DELAY_SECONDS = float(os.getenv("API_DELAY_SECONDS", 2))
+
+
 # GitHub API headers with optional authentication
 def get_headers():
     headers = {"Accept": "application/vnd.github+json", "User-Agent": "PR-Watcher"}
@@ -81,7 +85,7 @@ def collect_data():
                     time.sleep(10)  # Wait 10 seconds before retry
 
         # Rate limiting: wait between API calls
-        time.sleep(1.0)
+        time.sleep(API_DELAY_SECONDS)
 
     # Save data to CSV
     timestamp = dt.datetime.now(dt.UTC).strftime("%Y‑%m‑%d %H:%M:%S")
