@@ -72,16 +72,32 @@ def collect_data():
                     headers=headers,
                     timeout=30,
                 )
+
+                # If rate limited, wait until reset and retry
+                if (
+                    r.status_code == 403
+                    and r.headers.get("X-RateLimit-Remaining") == "0"
+                ):
+                    reset = int(r.headers.get("X-RateLimit-Reset", 0))
+                    wait_for = max(reset - time.time(), 0) + 1
+                    print(
+                        f"    Rate limit exceeded, sleeping for {int(wait_for)}s before retry"
+                    )
+                    time.sleep(wait_for)
+                    continue
+
                 r.raise_for_status()
                 cnt[key] = r.json()["total_count"]
                 print(f"  {key}: {cnt[key]}")
                 break
-                
+
             except Exception as e:
                 if attempt == max_attempts - 1:  # Last attempt - fail the job
                     raise e
                 else:
-                    print(f"    Attempt {attempt + 1} failed, retrying...")
+                    print(
+                        f"    Attempt {attempt + 1} failed ({e}), retrying in 10s..."
+                    )
                     time.sleep(10)  # Wait 10 seconds before retry
 
         # Rate limiting: wait between API calls
