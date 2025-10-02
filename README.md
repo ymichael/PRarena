@@ -40,6 +40,10 @@ Explore the GitHub search queries used:
 - **Merged Codegen PRs**: [https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:merged&type=pullrequests](https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:merged&type=pullrequests)
   
 
+- **All Terragon PRs**: [https://github.com/search?q=is:pr+head:terragon/&type=pullrequests](https://github.com/search?q=is:pr+head:terragon/&type=pullrequests)
+- **Merged Terragon PRs**: [https://github.com/search?q=is:pr+head:terragon/+is:merged&type=pullrequests](https://github.com/search?q=is:pr+head:terragon/+is:merged&type=pullrequests)
+  
+
 ---
 
 ![chart](docs/chart.png)
@@ -48,8 +52,9 @@ Explore the GitHub search queries used:
 
 | Project | Ready PRs | Merged PRs | Success Rate |
 | ------- | --------- | ---------- | ------------ |
-| Copilot | 167,633 | 155,597 | 92.82% |
-| Codex | 1,743,771 | 1,527,293 | 87.59% |
-| Cursor | 99,680 | 93,622 | 93.92% |
-| Devin | 41,751 | 26,558 | 63.61% |
+| Copilot | 167,684 | 155,653 | 92.83% |
+| Codex | 1,744,046 | 1,527,523 | 87.59% |
+| Cursor | 99,611 | 93,551 | 93.92% |
+| Devin | 41,751 | 26,559 | 63.61% |
 | Codegen | 5,003 | 3,056 | 61.08% |
+| Terragon | 8,066 | 7,819 | 96.94% |
