@@ -25,6 +25,9 @@ AGENTS = [
         "display": "Copilot",
         "long_name": "GitHub Copilot coding agent",
         "color": "#2563eb",
+        "colors": {"total": "#93c5fd", "merged": "#2563eb", "line": "#1d4ed8"},
+        "marker": "o",
+        "annotation_offset": (0, 15),
         "info_url": "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent",
         "total_query_url": "https://github.com/search?q=is:pr+head:copilot/&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+head:copilot/+is:merged&type=pullrequests",
@@ -36,6 +39,9 @@ AGENTS = [
         "display": "Codex",
         "long_name": "OpenAI Codex",
         "color": "#dc2626",
+        "colors": {"total": "#fca5a5", "merged": "#dc2626", "line": "#b91c1c"},
+        "marker": "s",
+        "annotation_offset": (0, -20),
         "info_url": "https://openai.com/index/introducing-codex/",
         "total_query_url": "https://github.com/search?q=is:pr+head:codex/&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+head:codex/+is:merged&type=pullrequests",
@@ -47,6 +53,9 @@ AGENTS = [
         "display": "Cursor",
         "long_name": "Cursor Agents",
         "color": "#7c3aed",
+        "colors": {"total": "#c4b5fd", "merged": "#7c3aed", "line": "#6d28d9"},
+        "marker": "d",
+        "annotation_offset": (0, -35),
         "info_url": "https://docs.cursor.com/background-agent",
         "total_query_url": "https://github.com/search?q=is:pr+head:cursor/&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests",
@@ -58,6 +67,9 @@ AGENTS = [
         "display": "Devin",
         "long_name": "Devin",
         "color": "#059669",
+        "colors": {"total": "#86efac", "merged": "#059669", "line": "#047857"},
+        "marker": "^",
+        "annotation_offset": (0, -50),
         "info_url": "https://devin.ai/pricing",
         "total_query_url": "https://github.com/search?q=is:pr+author:devin-ai-integration[bot]&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+author:devin-ai-integration[bot]+is:merged&type=pullrequests",
@@ -69,11 +81,28 @@ AGENTS = [
         "display": "Codegen",
         "long_name": "Codegen",
         "color": "#d97706",
+        "colors": {"total": "#fed7aa", "merged": "#d97706", "line": "#b45309"},
+        "marker": "v",
+        "annotation_offset": (0, -65),
         "info_url": "https://codegen.com/",
         "total_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:merged&type=pullrequests",
         "ready_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]+-is:draft&type=pullrequests",
         "draft_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:draft&type=pullrequests",
+    },
+    {
+        "key": "terragon",
+        "display": "Terragon Labs",
+        "long_name": "Terragon Labs",
+        "color": "#0ea5e9",
+        "colors": {"total": "#bae6fd", "merged": "#0284c7", "line": "#0ea5e9"},
+        "marker": "P",
+        "annotation_offset": (0, -80),
+        "info_url": "https://terragonlabs.com/",
+        "total_query_url": "https://github.com/search?q=is:pr+head:terragon/&type=pullrequests",
+        "merged_query_url": "https://github.com/search?q=is:pr+head:terragon/+is:merged&type=pullrequests",
+        "ready_query_url": "https://github.com/search?q=is:pr+head:terragon/+-is:draft&type=pullrequests",
+        "draft_query_url": "https://github.com/search?q=is:pr+head:terragon/+is:draft&type=pullrequests",
     },
 ]
 
@@ -81,26 +110,27 @@ AGENTS = [
 def build_stats(latest, df=None):
     stats = {}
 
-    # Get real data for each agent
+    def as_int(value, fallback=0):
+        if pd.isna(value):
+            return fallback
+        return int(value)
+
     for agent in AGENTS:
         key = agent["key"]
-        total = int(latest[f"{key}_total"])
-        merged = int(latest[f"{key}_merged"])
-        nondraft = (
-            int(latest[f"{key}_nondraft"]) if f"{key}_nondraft" in latest else total
-        )
+        total = as_int(latest.get(f"{key}_total"), 0)
+        merged = as_int(latest.get(f"{key}_merged"), 0)
+        nondraft = as_int(latest.get(f"{key}_nondraft"), total)
 
-        # Calculate rates for different PR types
         total_rate = (merged / total * 100) if total > 0 else 0
         ready_rate = (merged / nondraft * 100) if nondraft > 0 else 0
 
         stats[key] = {
             "total": total,
             "merged": merged,
-            "nondraft": nondraft,  # ready PRs (non-draft)
-            "rate": ready_rate,  # Default to ready PR success rate
-            "total_rate": total_rate,  # Success rate including drafts
-            "ready_rate": ready_rate,  # Success rate for ready PRs only
+            "nondraft": nondraft,
+            "rate": ready_rate,
+            "total_rate": total_rate,
+            "ready_rate": ready_rate,
         }
     return stats
 
@@ -137,90 +167,24 @@ def generate_chart(csv_file=None):
             f"Limited chart to 8 data points evenly distributed across {total_points} total points."
         )
 
-    # Calculate percentages with safety checks - both ready and total rates
-    # Ready rate (merged/nondraft) - default for chart display
-    df["copilot_percentage"] = df.apply(
-        lambda row: (
-            (row["copilot_merged"] / row["copilot_nondraft"] * 100)
-            if row["copilot_nondraft"] > 0
-            else 0
-        ),
-        axis=1,
-    )
-    df["codex_percentage"] = df.apply(
-        lambda row: (
-            (row["codex_merged"] / row["codex_nondraft"] * 100)
-            if row["codex_nondraft"] > 0
-            else 0
-        ),
-        axis=1,
-    )
-    df["cursor_percentage"] = df.apply(
-        lambda row: (
-            (row["cursor_merged"] / row["cursor_nondraft"] * 100)
-            if row["cursor_nondraft"] > 0
-            else 0
-        ),
-        axis=1,
-    )
-    df["devin_percentage"] = df.apply(
-        lambda row: (
-            (row["devin_merged"] / row["devin_nondraft"] * 100)
-            if row["devin_nondraft"] > 0
-            else 0
-        ),
-        axis=1,
-    )
-    df["codegen_percentage"] = df.apply(
-        lambda row: (
-            (row["codegen_merged"] / row["codegen_nondraft"] * 100)
-            if row["codegen_nondraft"] > 0
-            else 0
-        ),
-        axis=1,
-    )
+    # Ensure metric columns exist for all agents (backward compatibility with older CSVs)
+    for agent in AGENTS:
+        key = agent["key"]
+        for suffix in ("total", "merged", "nondraft"):
+            column = f"{key}_{suffix}"
+            if column not in df.columns:
+                df[column] = 0
+            df[column] = pd.to_numeric(df[column], errors="coerce").fillna(0).astype(int)
 
-    # Total rate (merged/total) - for alternative view
-    df["copilot_total_percentage"] = df.apply(
-        lambda row: (
-            (row["copilot_merged"] / row["copilot_total"] * 100)
-            if row["copilot_total"] > 0
-            else 0
-        ),
-        axis=1,
-    )
-    df["codex_total_percentage"] = df.apply(
-        lambda row: (
-            (row["codex_merged"] / row["codex_total"] * 100)
-            if row["codex_total"] > 0
-            else 0
-        ),
-        axis=1,
-    )
-    df["cursor_total_percentage"] = df.apply(
-        lambda row: (
-            (row["cursor_merged"] / row["cursor_total"] * 100)
-            if row["cursor_total"] > 0
-            else 0
-        ),
-        axis=1,
-    )
-    df["devin_total_percentage"] = df.apply(
-        lambda row: (
-            (row["devin_merged"] / row["devin_total"] * 100)
-            if row["devin_total"] > 0
-            else 0
-        ),
-        axis=1,
-    )
-    df["codegen_total_percentage"] = df.apply(
-        lambda row: (
-            (row["codegen_merged"] / row["codegen_total"] * 100)
-            if row["codegen_total"] > 0
-            else 0
-        ),
-        axis=1,
-    )
+        merged_col = f"{key}_merged"
+        nondraft_col = f"{key}_nondraft"
+        total_col = f"{key}_total"
+
+        ready_rate = (df[merged_col] / df[nondraft_col].replace(0, np.nan) * 100).fillna(0)
+        total_rate = (df[merged_col] / df[total_col].replace(0, np.nan) * 100).fillna(0)
+
+        df[f"{key}_percentage"] = ready_rate
+        df[f"{key}_total_percentage"] = total_rate
 
     # Adjust chart size based on data points, adding extra space for legends
     num_points = len(df)
@@ -237,160 +201,51 @@ def generate_chart(csv_file=None):
 
     # Prepare data
     x = np.arange(len(df))
-    # Adjust bar width based on number of data points (5 groups now)
-    width = min(0.16, 0.8 / max(1, num_points * 0.6))
-
-    # Bar charts for totals and merged
-    bars_copilot_total = ax1.bar(
-        x - 2 * width,
-        df["copilot_total"],
-        width,
-        label="Copilot Total",
-        alpha=0.7,
-        color="#93c5fd",
-    )
-    bars_copilot_merged = ax1.bar(
-        x - 2 * width,
-        df["copilot_merged"],
-        width,
-        label="Copilot Merged",
-        alpha=1.0,
-        color="#2563eb",
+    num_agents = len(AGENTS)
+    width = min(0.12, 0.8 / max(1, num_agents))
+    offsets = (
+        np.linspace(-(num_agents - 1) / 2, (num_agents - 1) / 2, num_agents)
+        if num_agents > 1
+        else np.array([0])
     )
 
-    bars_codex_total = ax1.bar(
-        x - 1 * width,
-        df["codex_total"],
-        width,
-        label="Codex Total",
-        alpha=0.7,
-        color="#fca5a5",
-    )
-    bars_codex_merged = ax1.bar(
-        x - 1 * width,
-        df["codex_merged"],
-        width,
-        label="Codex Merged",
-        alpha=1.0,
-        color="#dc2626",
-    )
-
-    bars_cursor_total = ax1.bar(
-        x + 0 * width,
-        df["cursor_total"],
-        width,
-        label="Cursor Total",
-        alpha=0.7,
-        color="#c4b5fd",
-    )
-    bars_cursor_merged = ax1.bar(
-        x + 0 * width,
-        df["cursor_merged"],
-        width,
-        label="Cursor Merged",
-        alpha=1.0,
-        color="#7c3aed",
-    )
-
-    bars_devin_total = ax1.bar(
-        x + 1 * width,
-        df["devin_total"],
-        width,
-        label="Devin Total",
-        alpha=0.7,
-        color="#86efac",
-    )
-    bars_devin_merged = ax1.bar(
-        x + 1 * width,
-        df["devin_merged"],
-        width,
-        label="Devin Merged",
-        alpha=1.0,
-        color="#059669",
-    )
-
-    bars_codegen_total = ax1.bar(
-        x + 2 * width,
-        df["codegen_total"],
-        width,
-        label="Codegen Total",
-        alpha=0.7,
-        color="#fed7aa",
-    )
-    bars_codegen_merged = ax1.bar(
-        x + 2 * width,
-        df["codegen_merged"],
-        width,
-        label="Codegen Merged",
-        alpha=1.0,
-        color="#d97706",
-    )
+    bar_containers = []
+    for offset, agent in zip(offsets, AGENTS):
+        key = agent["key"]
+        positions = x + offset * width
+        bars_total = ax1.bar(
+            positions,
+            df[f"{key}_total"],
+            width,
+            label=f"{agent['display']} Total",
+            alpha=0.7,
+            color=agent["colors"]["total"],
+        )
+        bars_merged = ax1.bar(
+            positions,
+            df[f"{key}_merged"],
+            width,
+            label=f"{agent['display']} Merged",
+            alpha=1.0,
+            color=agent["colors"]["merged"],
+        )
+        bar_containers.extend([bars_total, bars_merged])
 
     # Line charts for percentages (on secondary y-axis)
-    line_copilot = ax2.plot(
-        x,
-        df["copilot_percentage"],
-        "o-",
-        color="#1d4ed8",
-        linewidth=3,
-        markersize=10,
-        label="Copilot Success %",
-        markerfacecolor="white",
-        markeredgewidth=2,
-        markeredgecolor="#1d4ed8",
-    )
-
-    line_codex = ax2.plot(
-        x,
-        df["codex_percentage"],
-        "s-",
-        color="#b91c1c",
-        linewidth=3,
-        markersize=10,
-        label="Codex Success %",
-        markerfacecolor="white",
-        markeredgewidth=2,
-        markeredgecolor="#b91c1c",
-    )
-
-    line_cursor = ax2.plot(
-        x,
-        df["cursor_percentage"],
-        "d-",
-        color="#6d28d9",
-        linewidth=3,
-        markersize=10,
-        label="Cursor Success %",
-        markerfacecolor="white",
-        markeredgewidth=2,
-        markeredgecolor="#6d28d9",
-    )
-
-    line_devin = ax2.plot(
-        x,
-        df["devin_percentage"],
-        "^-",
-        color="#047857",
-        linewidth=3,
-        markersize=10,
-        label="Devin Success %",
-        markerfacecolor="white",
-        markeredgewidth=2,
-        markeredgecolor="#047857",
-    )
-
-    line_codegen = ax2.plot(
-        x,
-        df["codegen_percentage"],
-        "v-",
-        color="#b45309",
-        linewidth=3,
-        markersize=10,
-        label="Codegen Success %",
-        markerfacecolor="white",
-        markeredgewidth=2,
-        markeredgecolor="#b45309",
-    )
+    for agent in AGENTS:
+        key = agent["key"]
+        ax2.plot(
+            x,
+            df[f"{key}_percentage"],
+            f"{agent['marker']}-",
+            color=agent["colors"]["line"],
+            linewidth=3,
+            markersize=10,
+            label=f"{agent['display']} Success %",
+            markerfacecolor="white",
+            markeredgewidth=2,
+            markeredgecolor=agent["colors"]["line"],
+        )
 
     # Customize the chart
     ax1.set_xlabel("Data Points", fontsize=12, fontweight="bold")
@@ -444,89 +299,25 @@ def generate_chart(csv_file=None):
                     color="black",
                 )
 
-    add_value_labels(ax1, bars_copilot_total)
-    add_value_labels(ax1, bars_copilot_merged)
-    add_value_labels(ax1, bars_codex_total)
-    add_value_labels(ax1, bars_codex_merged)
-    add_value_labels(ax1, bars_cursor_total)
-    add_value_labels(ax1, bars_cursor_merged)
-    add_value_labels(ax1, bars_devin_total)
-    add_value_labels(ax1, bars_devin_merged)
-    add_value_labels(ax1, bars_codegen_total)
-    add_value_labels(ax1, bars_codegen_merged)
+    for bars in bar_containers:
+        add_value_labels(ax1, bars)
 
     # Add percentage labels on line points (with validation and skip 0.0%)
-    for i, (cop_pct, cod_pct, cur_pct, dev_pct, cg_pct) in enumerate(
-        zip(
-            df["copilot_percentage"],
-            df["codex_percentage"],
-            df["cursor_percentage"],
-            df["devin_percentage"],
-            df["codegen_percentage"],
-        )
-    ):
-        # Only add labels if percentages are valid numbers and not 0.0%
-        if (
-            pd.notna(cop_pct)
-            and pd.notna(cod_pct)
-            and pd.notna(cur_pct)
-            and pd.notna(dev_pct)
-            and pd.notna(cg_pct)
-        ):
-            if cop_pct > 0.0:
+    for idx in range(len(df)):
+        for agent in AGENTS:
+            key = agent["key"]
+            pct = df[f"{key}_percentage"].iat[idx]
+            if pd.notna(pct) and pct > 0.0:
+                offset_x, offset_y = agent.get("annotation_offset", (0, 12))
                 ax2.annotate(
-                    f"{cop_pct:.1f}%",
-                    (i, cop_pct),
+                    f"{pct:.1f}%",
+                    (idx, pct),
                     textcoords="offset points",
-                    xytext=(0, 15),
+                    xytext=(offset_x, offset_y),
                     ha="center",
                     fontsize=10,
                     fontweight="bold",
-                    color="#1d4ed8",
-                )
-            if cod_pct > 0.0:
-                ax2.annotate(
-                    f"{cod_pct:.1f}%",
-                    (i, cod_pct),
-                    textcoords="offset points",
-                    xytext=(0, -20),
-                    ha="center",
-                    fontsize=10,
-                    fontweight="bold",
-                    color="#b91c1c",
-                )
-            if cur_pct > 0.0:
-                ax2.annotate(
-                    f"{cur_pct:.1f}%",
-                    (i, cur_pct),
-                    textcoords="offset points",
-                    xytext=(0, -35),
-                    ha="center",
-                    fontsize=10,
-                    fontweight="bold",
-                    color="#6d28d9",
-                )
-            if dev_pct > 0.0:
-                ax2.annotate(
-                    f"{dev_pct:.1f}%",
-                    (i, dev_pct),
-                    textcoords="offset points",
-                    xytext=(0, -50),
-                    ha="center",
-                    fontsize=10,
-                    fontweight="bold",
-                    color="#047857",
-                )
-            if cg_pct > 0.0:
-                ax2.annotate(
-                    f"{cg_pct:.1f}%",
-                    (i, cg_pct),
-                    textcoords="offset points",
-                    xytext=(0, -65),
-                    ha="center",
-                    fontsize=10,
-                    fontweight="bold",
-                    color="#b45309",
+                    color=agent["colors"]["line"],
                 )
 
     plt.tight_layout(pad=6.0)
@@ -569,22 +360,17 @@ def export_chart_data_json(df):
             timestamp = pd.to_datetime(timestamp)
         chart_data["labels"].append(timestamp.strftime("%m/%d %H:%M"))
 
-    # Color scheme matching the Python chart - elegant professional colors
-    colors = {
-        "copilot": {"total": "#93c5fd", "merged": "#2563eb", "line": "#1d4ed8"},
-        "codex": {"total": "#fca5a5", "merged": "#dc2626", "line": "#b91c1c"},
-        "cursor": {"total": "#c4b5fd", "merged": "#7c3aed", "line": "#6d28d9"},
-        "devin": {"total": "#86efac", "merged": "#059669", "line": "#047857"},
-        "codegen": {"total": "#fed7aa", "merged": "#d97706", "line": "#b45309"},
-    }
+    colors = {agent["key"]: agent["colors"] for agent in AGENTS}
 
     # Add bar datasets for totals and merged PRs
-    for agent in ["copilot", "codex", "cursor", "devin", "codegen"]:
+    for agent in AGENTS:
+        agent_key = agent["key"]
+        agent_label = agent["display"]
         # Process data to replace leading zeros with None (null in JSON)
-        total_data = df[f"{agent}_total"].tolist()
-        merged_data = df[f"{agent}_merged"].tolist()
-        ready_percentage_data = df[f"{agent}_percentage"].tolist()  # ready rate
-        total_percentage_data = df[f"{agent}_total_percentage"].tolist()  # total rate
+        total_data = df[f"{agent_key}_total"].tolist()
+        merged_data = df[f"{agent_key}_merged"].tolist()
+        ready_percentage_data = df[f"{agent_key}_percentage"].tolist()
+        total_percentage_data = df[f"{agent_key}_total_percentage"].tolist()
 
         # Find first non-zero total value index
         first_nonzero_idx = None
@@ -604,11 +390,11 @@ def export_chart_data_json(df):
         # Total PRs
         chart_data["datasets"].append(
             {
-                "label": f"{agent.title()} Total",
+                "label": f"{agent_label} Total",
                 "type": "bar",
                 "data": total_data,
-                "backgroundColor": colors[agent]["total"],
-                "borderColor": colors[agent]["total"],
+                "backgroundColor": colors[agent_key]["total"],
+                "borderColor": colors[agent_key]["total"],
                 "borderWidth": 1,
                 "yAxisID": "y",
                 "order": 2,
@@ -618,11 +404,11 @@ def export_chart_data_json(df):
         # Merged PRs
         chart_data["datasets"].append(
             {
-                "label": f"{agent.title()} Merged",
+                "label": f"{agent_label} Merged",
                 "type": "bar",
                 "data": merged_data,
-                "backgroundColor": colors[agent]["merged"],
-                "borderColor": colors[agent]["merged"],
+                "backgroundColor": colors[agent_key]["merged"],
+                "borderColor": colors[agent_key]["merged"],
                 "borderWidth": 1,
                 "yAxisID": "y",
                 "order": 2,
@@ -632,10 +418,10 @@ def export_chart_data_json(df):
         # Success rate line (ready PRs) - shown by default
         chart_data["datasets"].append(
             {
-                "label": f"{agent.title()} Success % (Ready)",
+                "label": f"{agent_label} Success % (Ready)",
                 "type": "line",
                 "data": ready_percentage_data,
-                "borderColor": colors[agent]["line"],
+                "borderColor": colors[agent_key]["line"],
                 "backgroundColor": "rgba(255, 255, 255, 0.8)",
                 "borderWidth": 3,
                 "pointRadius": 3,
@@ -650,10 +436,10 @@ def export_chart_data_json(df):
         # Success rate line (all PRs) - hidden by default
         chart_data["datasets"].append(
             {
-                "label": f"{agent.title()} Success % (All)",
+                "label": f"{agent_label} Success % (All)",
                 "type": "line",
                 "data": total_percentage_data,
-                "borderColor": colors[agent]["line"],
+                "borderColor": colors[agent_key]["line"],
                 "backgroundColor": "rgba(255, 255, 255, 0.8)",
                 "borderWidth": 3,
                 "pointRadius": 3,
