@@ -75,6 +75,17 @@ AGENTS = [
         "ready_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]+-is:draft&type=pullrequests",
         "draft_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:draft&type=pullrequests",
     },
+    {
+        "key": "terragon",
+        "display": "Terragon",
+        "long_name": "Terragon Labs",
+        "color": "#ec4899",
+        "info_url": "https://terragonlabs.com/",
+        "total_query_url": "https://github.com/search?q=is:pr+head:terragon/&type=pullrequests",
+        "merged_query_url": "https://github.com/search?q=is:pr+head:terragon/+is:merged&type=pullrequests",
+        "ready_query_url": "https://github.com/search?q=is:pr+head:terragon/+-is:draft&type=pullrequests",
+        "draft_query_url": "https://github.com/search?q=is:pr+head:terragon/+is:draft&type=pullrequests",
+    },
 ]
 
 
@@ -179,6 +190,14 @@ def generate_chart(csv_file=None):
         ),
         axis=1,
     )
+    df["terragon_percentage"] = df.apply(
+        lambda row: (
+            (row["terragon_merged"] / row["terragon_nondraft"] * 100)
+            if row["terragon_nondraft"] > 0
+            else 0
+        ),
+        axis=1,
+    )
 
     # Total rate (merged/total) - for alternative view
     df["copilot_total_percentage"] = df.apply(
@@ -221,6 +240,14 @@ def generate_chart(csv_file=None):
         ),
         axis=1,
     )
+    df["terragon_total_percentage"] = df.apply(
+        lambda row: (
+            (row["terragon_merged"] / row["terragon_total"] * 100)
+            if row["terragon_total"] > 0
+            else 0
+        ),
+        axis=1,
+    )
 
     # Adjust chart size based on data points, adding extra space for legends
     num_points = len(df)
@@ -237,12 +264,12 @@ def generate_chart(csv_file=None):
 
     # Prepare data
     x = np.arange(len(df))
-    # Adjust bar width based on number of data points (5 groups now)
-    width = min(0.16, 0.8 / max(1, num_points * 0.6))
+    # Adjust bar width based on number of data points (6 groups now)
+    width = min(0.13, 0.8 / max(1, num_points * 0.65))
 
     # Bar charts for totals and merged
     bars_copilot_total = ax1.bar(
-        x - 2 * width,
+        x - 2.5 * width,
         df["copilot_total"],
         width,
         label="Copilot Total",
@@ -250,7 +277,7 @@ def generate_chart(csv_file=None):
         color="#93c5fd",
     )
     bars_copilot_merged = ax1.bar(
-        x - 2 * width,
+        x - 2.5 * width,
         df["copilot_merged"],
         width,
         label="Copilot Merged",
@@ -259,7 +286,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_codex_total = ax1.bar(
-        x - 1 * width,
+        x - 1.5 * width,
         df["codex_total"],
         width,
         label="Codex Total",
@@ -267,7 +294,7 @@ def generate_chart(csv_file=None):
         color="#fca5a5",
     )
     bars_codex_merged = ax1.bar(
-        x - 1 * width,
+        x - 1.5 * width,
         df["codex_merged"],
         width,
         label="Codex Merged",
@@ -276,7 +303,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_cursor_total = ax1.bar(
-        x + 0 * width,
+        x - 0.5 * width,
         df["cursor_total"],
         width,
         label="Cursor Total",
@@ -284,7 +311,7 @@ def generate_chart(csv_file=None):
         color="#c4b5fd",
     )
     bars_cursor_merged = ax1.bar(
-        x + 0 * width,
+        x - 0.5 * width,
         df["cursor_merged"],
         width,
         label="Cursor Merged",
@@ -293,7 +320,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_devin_total = ax1.bar(
-        x + 1 * width,
+        x + 0.5 * width,
         df["devin_total"],
         width,
         label="Devin Total",
@@ -301,7 +328,7 @@ def generate_chart(csv_file=None):
         color="#86efac",
     )
     bars_devin_merged = ax1.bar(
-        x + 1 * width,
+        x + 0.5 * width,
         df["devin_merged"],
         width,
         label="Devin Merged",
@@ -310,7 +337,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_codegen_total = ax1.bar(
-        x + 2 * width,
+        x + 1.5 * width,
         df["codegen_total"],
         width,
         label="Codegen Total",
@@ -318,12 +345,29 @@ def generate_chart(csv_file=None):
         color="#fed7aa",
     )
     bars_codegen_merged = ax1.bar(
-        x + 2 * width,
+        x + 1.5 * width,
         df["codegen_merged"],
         width,
         label="Codegen Merged",
         alpha=1.0,
         color="#d97706",
+    )
+
+    bars_terragon_total = ax1.bar(
+        x + 2.5 * width,
+        df["terragon_total"],
+        width,
+        label="Terragon Total",
+        alpha=0.7,
+        color="#fbcfe8",
+    )
+    bars_terragon_merged = ax1.bar(
+        x + 2.5 * width,
+        df["terragon_merged"],
+        width,
+        label="Terragon Merged",
+        alpha=1.0,
+        color="#ec4899",
     )
 
     # Line charts for percentages (on secondary y-axis)
@@ -392,6 +436,19 @@ def generate_chart(csv_file=None):
         markeredgecolor="#b45309",
     )
 
+    line_terragon = ax2.plot(
+        x,
+        df["terragon_percentage"],
+        "p-",
+        color="#be185d",
+        linewidth=3,
+        markersize=10,
+        label="Terragon Success %",
+        markerfacecolor="white",
+        markeredgewidth=2,
+        markeredgecolor="#be185d",
+    )
+
     # Customize the chart
     ax1.set_xlabel("Data Points", fontsize=12, fontweight="bold")
     ax1.set_ylabel(
@@ -454,15 +511,18 @@ def generate_chart(csv_file=None):
     add_value_labels(ax1, bars_devin_merged)
     add_value_labels(ax1, bars_codegen_total)
     add_value_labels(ax1, bars_codegen_merged)
+    add_value_labels(ax1, bars_terragon_total)
+    add_value_labels(ax1, bars_terragon_merged)
 
     # Add percentage labels on line points (with validation and skip 0.0%)
-    for i, (cop_pct, cod_pct, cur_pct, dev_pct, cg_pct) in enumerate(
+    for i, (cop_pct, cod_pct, cur_pct, dev_pct, cg_pct, tr_pct) in enumerate(
         zip(
             df["copilot_percentage"],
             df["codex_percentage"],
             df["cursor_percentage"],
             df["devin_percentage"],
             df["codegen_percentage"],
+            df["terragon_percentage"],
         )
     ):
         # Only add labels if percentages are valid numbers and not 0.0%
@@ -472,6 +532,7 @@ def generate_chart(csv_file=None):
             and pd.notna(cur_pct)
             and pd.notna(dev_pct)
             and pd.notna(cg_pct)
+            and pd.notna(tr_pct)
         ):
             if cop_pct > 0.0:
                 ax2.annotate(
@@ -528,6 +589,17 @@ def generate_chart(csv_file=None):
                     fontweight="bold",
                     color="#b45309",
                 )
+            if tr_pct > 0.0:
+                ax2.annotate(
+                    f"{tr_pct:.1f}%",
+                    (i, tr_pct),
+                    textcoords="offset points",
+                    xytext=(0, -80),
+                    ha="center",
+                    fontsize=10,
+                    fontweight="bold",
+                    color="#be185d",
+                )
 
     plt.tight_layout(pad=6.0)
 
@@ -576,10 +648,11 @@ def export_chart_data_json(df):
         "cursor": {"total": "#c4b5fd", "merged": "#7c3aed", "line": "#6d28d9"},
         "devin": {"total": "#86efac", "merged": "#059669", "line": "#047857"},
         "codegen": {"total": "#fed7aa", "merged": "#d97706", "line": "#b45309"},
+        "terragon": {"total": "#fbcfe8", "merged": "#ec4899", "line": "#be185d"},
     }
 
     # Add bar datasets for totals and merged PRs
-    for agent in ["copilot", "codex", "cursor", "devin", "codegen"]:
+    for agent in ["copilot", "codex", "cursor", "devin", "codegen", "terragon"]:
         # Process data to replace leading zeros with None (null in JSON)
         total_data = df[f"{agent}_total"].tolist()
         merged_data = df[f"{agent}_merged"].tolist()
